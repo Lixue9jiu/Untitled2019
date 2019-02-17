@@ -1,0 +1,20 @@
+ManifestFileVersion: 0
+CRC: 2425993889
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 8bcf94312f5e2ac80ef437fe0e50585f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: f19fbf085e00d23fbc8d6cf7b345590b
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundle/Blocks/Dirt.png
+- Assets/AssetBundle/Blocks/Bedrock.png
+- Assets/AssetBundle/Blocks/Grass.png
+- Assets/AssetBundle/Blocks/GrassSide.png
+- Assets/AssetBundle/Blocks/Stone.png
+Dependencies: []

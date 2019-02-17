@@ -1,0 +1,16 @@
+ManifestFileVersion: 0
+CRC: 1804813215
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 4b625c7c8750298c246ae74ba53be66f
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: f19fbf085e00d23fbc8d6cf7b345590b
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+Assets:
+- Assets/AssetBundle/Textures/template.pvr
+Dependencies: []
