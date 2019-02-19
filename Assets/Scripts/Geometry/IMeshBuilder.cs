@@ -15,4 +15,5 @@ public interface IMeshBuilder
     /// <param name="cc">Cc.</param>
     /// <param name="cd">Cd.</param>
     void Quad(Vector3Int pos, int face, Rect tex, Color ca, Color cb, Color cc, Color cd);
+    void Mesh(Vector3Int pos, Mesh mesh);
 }

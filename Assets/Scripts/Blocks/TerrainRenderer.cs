@@ -79,27 +79,123 @@ public class TerrainRenderer : MonoBehaviour
         freeIndices.Enqueue(index);
     }
 
+    /// <summary>
+    /// Builds the bounding mesh using Greedy Meshing
+    /// </summary>
+    /// <returns>The bounding mesh.</returns>
+    /// <param name="cx">chunkx.</param>
+    /// <param name="cz">chunkz</param>
     private Mesh BuildBoundingMesh(int cx, int cz)
     {
         var chunk = m_terrainManager.GetChunk(cx, cz);
+        //Chunk[] neighbors =
+        //{
+        //    m_terrainManager.GetChunk(cx - 1, cz),
+        //    Chunk.airChunk,
+        //    m_terrainManager.GetChunk(cx, cz - 1),
+        //    m_terrainManager.GetChunk(cx + 1, cz),
+        //    Chunk.airChunk,
+        //    m_terrainManager.GetChunk(cx, cz + 1)
+        //};
         Chunk[] neighbors =
         {
-            m_terrainManager.GetChunk(cx + 1, cz),
-            m_terrainManager.GetChunk(cx - 1, cz),
-            m_terrainManager.GetChunk(cx, cz + 1),
-            m_terrainManager.GetChunk(cx, cz - 1)
+            Chunk.airChunk,
+            Chunk.airChunk,
+            Chunk.airChunk,
+            Chunk.airChunk,
+            Chunk.airChunk,
+            Chunk.airChunk,
         };
-        var render = new DefualtBlockRenderer(new Rect[6]);
-        MeshBuilder builder = new MeshBuilder();
-        for (int x = 0; x < Chunk.SIZE_X; x++)
+
+        Vector3Int dim = new Vector3Int(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z);
+        Vector3Int dimShift = new Vector3Int(Chunk.SIZE_X_MINUS_ONE, Chunk.SIZE_Y_MINUS_ONE, Chunk.SIZE_Z_MINUS_ONE);
+        ColliderMeshBuilder builder = new ColliderMeshBuilder();
+        for (int d = 0; d < 3; d++)
         {
-            for (int y = 0; y < Chunk.SIZE_Y; y++)
+            int u = (d + 1) % 3;
+            int v = (d + 2) % 3;
+
+            int[,] masks = new int[dim[u], dim[v]];
+
+            Vector3Int monika = new Vector3Int();
+            monika[d] = 1;
+            for (int i = -1; i < dim[d]; i++)
             {
-                for (int z = 0; z < Chunk.SIZE_Z; z++)
+                for (int j = 0; j < dim[u]; j++)
                 {
-                    var bb = m_bounds[BlockData.GetContent(chunk[x, y, z])];
-                    if (bb.HasValue)
-                        render.Render(new BlockRenderContext { chunk = chunk, neighbors = neighbors, blockManager = m_blockManager }, new Vector3Int(x, y, z), builder);
+                    for (int k = 0; k < dim[v]; k++)
+                    {
+                        Vector3Int x = new Vector3Int();
+                        x[d] = i;
+                        x[u] = j;
+                        x[v] = k;
+
+                        BlockBounds? a;
+                        BlockBounds? b;
+                        if (x[d] == -1)
+                            a = m_bounds[BlockData.GetContent(neighbors[d][x.x & dimShift.x, x.y & dimShift.y, x.z & dimShift.z])];
+                        else
+                            a = m_bounds[BlockData.GetContent(chunk[x])];
+                        if (x[d] + 1 == dim[d])
+                            b = m_bounds[BlockData.GetContent(neighbors[d + 3][(x.x + monika.x) & dimShift.x, (x.y + monika.y) & dimShift.y, (x.z + monika.z) & dimShift.z])];
+                        else
+                            b = m_bounds[BlockData.GetContent(chunk[x + monika])];
+                        bool hasFace = (a.HasValue && a.Value.isDefualt) != (b.HasValue && b.Value.isDefualt);
+                        masks[j, k] = hasFace ? 1 : 0 + (a.HasValue && a.Value.isDefualt ? 2 : 0);
+                    }
+                }
+
+                for (int j = 0; j < dim[u]; j++)
+                {
+                    for (int k = 0; k < dim[v];)
+                    {
+                        int point = masks[j, k];
+                        if ((point & 1) == 0)
+                        {
+                            k++;
+                            continue;
+                        }
+                        int w = 1;
+                        int h = 1;
+
+                        while (k + h < dim[v] && masks[j, k + h] == point)
+                        {
+                            masks[j, k + h] = 0;
+                            h++;
+                        }
+
+                        while (j + w < dim[u])
+                        {
+                            for (int l = 0; l < h; l++)
+                            {
+                                if (masks[j + w, k + l] != point)
+                                    goto here;
+                            }
+                            for (int l = 0; l < h; l++)
+                            {
+                                masks[j + w, k + l] = 0;
+                            }
+                            w++;
+                        }
+                        here:
+
+                        Debug.Log($"{w}, {h}");
+
+                        Vector3Int x = new Vector3Int();
+                        x[d] = i + 1;
+                        x[u] = j;
+                        x[v] = k;
+                        Vector3 umax = new Vector3();
+                        Vector3 vmax = new Vector3();
+                        umax[u] = w;
+                        vmax[v] = h;
+                        if ((point & 2) != 2)
+                            builder.Quad(x, x + umax, x + umax + vmax, x + vmax);
+                        else
+                            builder.Quad(x, x + vmax, x + umax + vmax, x + umax);
+
+                        k += h;
+                    }
                 }
             }
         }

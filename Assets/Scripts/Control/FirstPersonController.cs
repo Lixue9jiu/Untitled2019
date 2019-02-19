@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+// TODO: fix the jump
+// TODO: fix the gravity while on ground
+[RequireComponent(typeof(CharacterController))]
 public class FirstPersonController : MonoBehaviour
 {
     public float MouseSensitivity = 1f;
@@ -11,14 +13,17 @@ public class FirstPersonController : MonoBehaviour
     Transform cameraTransform;
     [SerializeField]
     private LayerMask Ground;
-    private Rigidbody rig;
+    private CharacterController chara;
     private Vector3 input;
     private float _pitch;
     private bool waitForInAir;
     private bool touchingGround;
+
+    private Vector3 velocity;
+
     private void Awake()
     {
-        rig = GetComponent<Rigidbody>();
+        chara = GetComponent<CharacterController>();
     }
 
     private void OnEnable()
@@ -38,18 +43,11 @@ public class FirstPersonController : MonoBehaviour
 
     private void Update()
     {
-        bool isTouchingGround = Physics.Raycast(transform.position, Vector3.down, 1f, Ground, QueryTriggerInteraction.Ignore);
-        touchingGround = isTouchingGround;
         input += transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal");
-        
-        if (!isTouchingGround)
+
+        if (touchingGround && Input.GetButton("Jump"))
         {
-            waitForInAir = false;
-        }
-        if (!waitForInAir && isTouchingGround && Input.GetButton("Jump") && rig.velocity.y == 0)
-        {
-            rig.AddForce(Vector3.up * 5, ForceMode.VelocityChange);
-            waitForInAir = true;
+            velocity.y += JumpHeight * -2 * Physics.gravity.y;
         }
 
         float pitch = _pitch - Input.GetAxisRaw("Mouse Y") * MouseSensitivity;
@@ -62,7 +60,10 @@ public class FirstPersonController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rig.AddForce(input, ForceMode.Force);
+        var flags = chara.Move((input + velocity) * Time.fixedDeltaTime);
+        touchingGround = (flags & CollisionFlags.Below) == CollisionFlags.Below;
+        if (!touchingGround)
+            velocity += Physics.gravity * Time.fixedDeltaTime;
         //rig.MovePosition(rig.position + input * Time.fixedDeltaTime * Speed);
         input = Vector3.zero;
     }

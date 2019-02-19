@@ -6,7 +6,30 @@ public class MainThread : MonoBehaviour
 {
     private void Start()
     {
-        Test1();
+        Test0();
+    }
+
+    private void Test0()
+    {
+        Chunk chunk = new Chunk();
+        var block = GetComponent<BlockManager>();
+        var bedrock = block.FindBlock("game:bedrock");
+        var dirt = block.FindBlock("game:dirt");
+        var grass = block.FindBlock("game:grass");
+        for (int x = 0; x < Chunk.SIZE_X; x++)
+            for (int y = 0; y < Chunk.SIZE_Y; y++)
+                for (int z = 0; z < Chunk.SIZE_Z; z++)
+                {
+                    if (y < 2)
+                        chunk[x, y, z] = bedrock;
+                    else if (y < 9)
+                        chunk[x, y, z] = dirt;
+                    else if (y < 10)
+                        chunk[x, y, z] = grass;
+                }
+
+        GetComponent<TerrainManager>().SetChunk(0, 0, chunk);
+        GetComponent<TerrainRenderer>().AddChunkToRender(0, 0);
     }
 
     private void Test1()
