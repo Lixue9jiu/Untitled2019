@@ -326,7 +326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MouseSensitivity: 3
   Speed: 2
-  JumpHeight: 0.5
+  JumpHeight: 4
   cameraTransform: {fileID: 534669905}
   Ground:
     serializedVersion: 2
@@ -355,7 +355,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1766482754}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8, y: 20, z: 8}
+  m_LocalPosition: {x: 8, y: 80, z: 8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 534669905}
@@ -374,7 +374,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 2
-  m_Radius: 0.5
+  m_Radius: 0.4
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08

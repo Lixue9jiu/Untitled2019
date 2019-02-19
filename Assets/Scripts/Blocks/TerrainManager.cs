@@ -3,19 +3,40 @@ using System.Collections.Generic;
 
 public class TerrainManager : MonoBehaviour
 {
-    Dictionary<Vector2Int, Chunk> chunks = new Dictionary<Vector2Int, Chunk>();
+    Dictionary<Vector3Int, Chunk> m_chunks = new Dictionary<Vector3Int, Chunk>();
+    Dictionary<Vector2Int, int> m_yChunkCount = new Dictionary<Vector2Int, int>();
 
-    public Chunk GetChunk(int x, int z)
+    public Chunk GetChunk(int x, int y, int z)
     {
-        if (!chunks.TryGetValue(new Vector2Int(x, z), out Chunk chunk))
+        if (!m_chunks.TryGetValue(new Vector3Int(x, y, z), out Chunk chunk))
         {
             return Chunk.airChunk;
         }
         return chunk;
     }
 
-    public void SetChunk(int x, int z, Chunk chunk)
+    public ChunkStack GetChunkStack(int x, int z)
     {
-        chunks[new Vector2Int(x, z)] = chunk;
+        int count = m_yChunkCount[new Vector2Int(x, z)];
+        Chunk[] chunks = new Chunk[count];
+        for (int i = 0; i < count; i++)
+        {
+            chunks[i] = GetChunk(x, i, z);
+        }
+        return new ChunkStack(chunks);
+    }
+
+    public void SetChunkStack(int x, int z, ChunkStack stack)
+    {
+        for (int i = 0; i < stack.Length; i++)
+        {
+            m_chunks[new Vector3Int(x, i, z)] = stack[i];
+        }
+        m_yChunkCount[new Vector2Int(x, z)] = stack.Length;
+    }
+
+    public int GetChunkYCount(int x, int z)
+    {
+        return m_yChunkCount[new Vector2Int(x, z)];
     }
 }

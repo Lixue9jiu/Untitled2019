@@ -38,7 +38,7 @@ public class BlockTextureManager : MonoBehaviour
             for (int k = 0; k < texs.Length; k++)
             {
                 src.SetPixels((k & 15) * texSize, (k >> 4) * texSize, texSize, texSize, texs[k].GetPixels(i), i);
-                texCoords[texs[k].name] = new Rect(0.0625f * (k & 15), 0.0625f * (k >> 4), 0.0625f, 0.0625f);
+                texCoords[texs[k].name] = new Rect(0.0625f * (k & 15) + 0.0001f, 0.0625f * (k >> 4) + 0.0001f, 0.0623f, 0.0623f);
             }
         }
         texCoords["Error"] = new Rect(0.0625f * texs.Length, 0.0625f * texs.Length, 0.0625f, 0.0625f);

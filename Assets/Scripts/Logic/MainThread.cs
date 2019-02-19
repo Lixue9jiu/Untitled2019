@@ -6,12 +6,12 @@ public class MainThread : MonoBehaviour
 {
     private void Start()
     {
-        Test0();
+        Test1();
     }
 
     private void Test0()
     {
-        Chunk chunk = new Chunk();
+        ChunkStack chunk = new ChunkStack(4);
         var block = GetComponent<BlockManager>();
         var bedrock = block.FindBlock("game:bedrock");
         var dirt = block.FindBlock("game:dirt");
@@ -33,8 +33,8 @@ public class MainThread : MonoBehaviour
                 for (int y = 10; y < 14; y++)
                     chunk[x, y, z] = stone;
 
-        GetComponent<TerrainManager>().SetChunk(0, 0, chunk);
-        GetComponent<TerrainRenderer>().AddChunkToRender(0, 0);
+        GetComponent<TerrainManager>().SetChunkStack(0, 0, chunk);
+        GetComponent<TerrainRenderer>().AddChunkStackToRender(0, 0);
     }
 
     private void Test1()
@@ -43,27 +43,27 @@ public class MainThread : MonoBehaviour
         {
             int cx = i & 3;
             int cz = i >> 2;
-            var chunk = new Chunk();
+            var chunk = new ChunkStack(4);
             GenerateTerrain(cx << 4, cz << 4, chunk);
-            GetComponent<TerrainManager>().SetChunk(cx, cz, chunk);
+            GetComponent<TerrainManager>().SetChunkStack(cx, cz, chunk);
         }
         for (int i = 0; i < 16; i++)
         {
-            GetComponent<TerrainRenderer>().AddChunkToRender(i & 3, i >> 2);
+            GetComponent<TerrainRenderer>().AddChunkStackToRender(i & 3, i >> 2);
         }
     }
 
-    private void GenerateTerrain(int ox, int oz, Chunk chunk)
+    private void GenerateTerrain(int ox, int oz, ChunkStack chunk)
     {
         var block = GetComponent<BlockManager>();
         var bedrock = block.FindBlock("game:bedrock");
         var dirt = block.FindBlock("game:dirt");
         var grass = block.FindBlock("game:grass");
         for (int x = 0; x < Chunk.SIZE_X; x++)
-            for (int y = 0; y < Chunk.SIZE_Y; y++)
+            for (int y = 0; y < Chunk.SIZE_Y * 4; y++)
                 for (int z = 0; z < Chunk.SIZE_Z; z++)
                 {
-                    float height = Mathf.PerlinNoise((ox + x) / 8f, (oz + z) / 8f) * 40;
+                    float height = GenerateHeight(ox + x, oz + z);
                     if (y < 2)
                         chunk[x, y, z] = bedrock;
                     else if (y < height)
@@ -71,5 +71,12 @@ public class MainThread : MonoBehaviour
                     else if (y < height + 1)
                         chunk[x, y, z] = grass;
                 }
+    }
+
+    private float GenerateHeight(int x, int y)
+    {
+        return Mathf.PerlinNoise(x / 32f, y / 32f) * 30 +
+            Mathf.PerlinNoise(x / 24f, y / 24f) * 20 +
+            Mathf.PerlinNoise(x / 16f, y / 16f) * 10;
     }
 }

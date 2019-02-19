@@ -7,15 +7,15 @@ using System.Collections;
 public class Chunk
 {
     public const int SIZE_X = 16;
-    public const int SIZE_Y = 128;
+    public const int SIZE_Y = 16;
     public const int SIZE_Z = 16;
 
     public const int SIZE_X_MINUS_ONE = 15;
-    public const int SIZE_Y_MINUS_ONE = 127;
+    public const int SIZE_Y_MINUS_ONE = 15;
     public const int SIZE_Z_MINUS_ONE = 15;
 
-    const int SHIFT_Y = 4;
-    const int SHIFT_Z = SHIFT_Y + 7;
+    public const int SHIFT_Y = 4;
+    public const int SHIFT_Z = SHIFT_Y + 4;
 
     public static readonly Chunk airChunk = new Chunk();
 

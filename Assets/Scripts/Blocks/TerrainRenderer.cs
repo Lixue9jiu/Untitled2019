@@ -52,28 +52,46 @@ public class TerrainRenderer : MonoBehaviour
         }
     }
 
-    public void AddChunkToRender(int x, int z)
+    public void AddChunkStackToRender(int x, int z)
     {
-        var instance = new ChunkInstance { mesh = BuildMesh(x, z), matrix = Matrix4x4.Translate(new Vector3(x << 4, 0, z << 4)) };
+        int count = m_terrainManager.GetChunkYCount(x, z);
+        for (int i = 0; i < count; i++)
+        {
+            AddChunkToRender(x, i, z);
+        }
+    }
+
+    public void RemoveChunkStackFromRender(int x, int z)
+    {
+        int count = m_terrainManager.GetChunkYCount(x, z);
+        for (int i = 0; i < count; i++)
+        {
+            RemoveChunkFromRender(x, i, z);
+        }
+    }
+
+    public void AddChunkToRender(int x, int y, int z)
+    {
+        var instance = new ChunkInstance { mesh = BuildMesh(x, y, z), matrix = Matrix4x4.Translate(new Vector3(x << 4, y << 4, z << 4)) };
         instance.collider = Instantiate(chunkPrefab, terrian.transform).GetComponent<MeshCollider>();
-        instance.collider.sharedMesh = BuildBoundingMesh(x, z);
-        instance.collider.transform.position = new Vector3(x << 4, 0, z << 4);
+        instance.collider.sharedMesh = BuildBoundingMesh(x, y, z);
+        instance.collider.transform.position = new Vector3(x << 4, y << 4, z << 4);
         if (freeIndices.Count == 0)
         {
-            m_terrainManager.GetChunk(x, z).RenderIndex = instances.Count;
+            m_terrainManager.GetChunk(x, y, z).RenderIndex = instances.Count;
             instances.Add(instance);
         }
         else
         {
             int index = freeIndices.Dequeue();
-            m_terrainManager.GetChunk(x, z).RenderIndex = index;
+            m_terrainManager.GetChunk(x, y, z).RenderIndex = index;
             instances[index] = instance;
         }
     }
 
-    public void RemoveChunkFromRender(int x, int z)
+    public void RemoveChunkFromRender(int x, int y, int z)
     {
-        int index = m_terrainManager.GetChunk(x, z).RenderIndex;
+        int index = m_terrainManager.GetChunk(x, y, z).RenderIndex;
         Destroy(instances[index].collider);
         instances[index] = null;
         freeIndices.Enqueue(index);
@@ -85,17 +103,17 @@ public class TerrainRenderer : MonoBehaviour
     /// <returns>The bounding mesh.</returns>
     /// <param name="cx">chunkx.</param>
     /// <param name="cz">chunkz</param>
-    private Mesh BuildBoundingMesh(int cx, int cz)
+    private Mesh BuildBoundingMesh(int cx, int cy, int cz)
     {
-        var chunk = m_terrainManager.GetChunk(cx, cz);
+        var chunk = m_terrainManager.GetChunk(cx, cy, cz);
         Chunk[] neighbors =
         {
-            m_terrainManager.GetChunk(cx - 1, cz),
-            Chunk.airChunk,
-            m_terrainManager.GetChunk(cx, cz - 1),
-            m_terrainManager.GetChunk(cx + 1, cz),
-            Chunk.airChunk,
-            m_terrainManager.GetChunk(cx, cz + 1)
+            m_terrainManager.GetChunk(cx - 1, cy, cz),
+            m_terrainManager.GetChunk(cx, cy - 1, cz),
+            m_terrainManager.GetChunk(cx, cy, cz - 1),
+            m_terrainManager.GetChunk(cx + 1, cy, cz),
+            m_terrainManager.GetChunk(cx, cy + 1, cz),
+            m_terrainManager.GetChunk(cx, cy, cz + 1)
         };
 
         Vector3Int dim = new Vector3Int(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z);
@@ -192,15 +210,17 @@ public class TerrainRenderer : MonoBehaviour
         return builder.ToMesh();
     }
 
-    private Mesh BuildMesh(int cx, int cz)
+    private Mesh BuildMesh(int cx, int cy, int cz)
     {
-        var chunk = m_terrainManager.GetChunk(cx, cz);
+        var chunk = m_terrainManager.GetChunk(cx, cy, cz);
         Chunk[] neighbors =
         {
-            m_terrainManager.GetChunk(cx + 1, cz),
-            m_terrainManager.GetChunk(cx - 1, cz),
-            m_terrainManager.GetChunk(cx, cz + 1),
-            m_terrainManager.GetChunk(cx, cz - 1)
+            m_terrainManager.GetChunk(cx + 1, cy, cz),
+            m_terrainManager.GetChunk(cx - 1, cy, cz),
+            m_terrainManager.GetChunk(cx, cy + 1, cz),
+            m_terrainManager.GetChunk(cx, cy - 1, cz),
+            m_terrainManager.GetChunk(cx, cy, cz + 1),
+            m_terrainManager.GetChunk(cx, cy, cz - 1)
         };
         MeshBuilder builder = new MeshBuilder();
         for (int x = 0; x < Chunk.SIZE_X; x++)
