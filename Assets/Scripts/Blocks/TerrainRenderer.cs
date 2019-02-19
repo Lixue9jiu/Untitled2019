@@ -88,23 +88,14 @@ public class TerrainRenderer : MonoBehaviour
     private Mesh BuildBoundingMesh(int cx, int cz)
     {
         var chunk = m_terrainManager.GetChunk(cx, cz);
-        //Chunk[] neighbors =
-        //{
-        //    m_terrainManager.GetChunk(cx - 1, cz),
-        //    Chunk.airChunk,
-        //    m_terrainManager.GetChunk(cx, cz - 1),
-        //    m_terrainManager.GetChunk(cx + 1, cz),
-        //    Chunk.airChunk,
-        //    m_terrainManager.GetChunk(cx, cz + 1)
-        //};
         Chunk[] neighbors =
         {
+            m_terrainManager.GetChunk(cx - 1, cz),
             Chunk.airChunk,
+            m_terrainManager.GetChunk(cx, cz - 1),
+            m_terrainManager.GetChunk(cx + 1, cz),
             Chunk.airChunk,
-            Chunk.airChunk,
-            Chunk.airChunk,
-            Chunk.airChunk,
-            Chunk.airChunk,
+            m_terrainManager.GetChunk(cx, cz + 1)
         };
 
         Vector3Int dim = new Vector3Int(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z);
@@ -141,7 +132,7 @@ public class TerrainRenderer : MonoBehaviour
                         else
                             b = m_bounds[BlockData.GetContent(chunk[x + monika])];
                         bool hasFace = (a.HasValue && a.Value.isDefualt) != (b.HasValue && b.Value.isDefualt);
-                        masks[j, k] = hasFace ? 1 : 0 + (a.HasValue && a.Value.isDefualt ? 2 : 0);
+                        masks[j, k] = (hasFace ? 1 : 0) + (a.HasValue && a.Value.isDefualt ? 2 : 0);
                     }
                 }
 
@@ -179,8 +170,6 @@ public class TerrainRenderer : MonoBehaviour
                         }
                         here:
 
-                        Debug.Log($"{w}, {h}");
-
                         Vector3Int x = new Vector3Int();
                         x[d] = i + 1;
                         x[u] = j;
@@ -189,7 +178,8 @@ public class TerrainRenderer : MonoBehaviour
                         Vector3 vmax = new Vector3();
                         umax[u] = w;
                         vmax[v] = h;
-                        if ((point & 2) != 2)
+
+                        if ((point & 2) == 2)
                             builder.Quad(x, x + umax, x + umax + vmax, x + vmax);
                         else
                             builder.Quad(x, x + vmax, x + umax + vmax, x + umax);

@@ -16,6 +16,7 @@ public class MainThread : MonoBehaviour
         var bedrock = block.FindBlock("game:bedrock");
         var dirt = block.FindBlock("game:dirt");
         var grass = block.FindBlock("game:grass");
+        var stone = block.FindBlock("game:stone");
         for (int x = 0; x < Chunk.SIZE_X; x++)
             for (int y = 0; y < Chunk.SIZE_Y; y++)
                 for (int z = 0; z < Chunk.SIZE_Z; z++)
@@ -27,6 +28,10 @@ public class MainThread : MonoBehaviour
                     else if (y < 10)
                         chunk[x, y, z] = grass;
                 }
+        for (int x = 6; x < 10; x++)
+            for (int z = 6; z < 10; z++)
+                for (int y = 10; y < 14; y++)
+                    chunk[x, y, z] = stone;
 
         GetComponent<TerrainManager>().SetChunk(0, 0, chunk);
         GetComponent<TerrainRenderer>().AddChunkToRender(0, 0);
@@ -58,7 +63,7 @@ public class MainThread : MonoBehaviour
             for (int y = 0; y < Chunk.SIZE_Y; y++)
                 for (int z = 0; z < Chunk.SIZE_Z; z++)
                 {
-                    float height = Mathf.PerlinNoise((ox + x) / 16f, (oz + z) / 16f) * 20;
+                    float height = Mathf.PerlinNoise((ox + x) / 8f, (oz + z) / 8f) * 40;
                     if (y < 2)
                         chunk[x, y, z] = bedrock;
                     else if (y < height)

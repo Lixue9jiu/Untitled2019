@@ -16,7 +16,6 @@ public class FirstPersonController : MonoBehaviour
     private CharacterController chara;
     private Vector3 input;
     private float _pitch;
-    private bool waitForInAir;
     private bool touchingGround;
 
     private Vector3 velocity;
@@ -29,16 +28,18 @@ public class FirstPersonController : MonoBehaviour
     private void OnEnable()
     {
         Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void OnDisable()
     {
         Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     private void OnGUI()
     {
-        GUI.Label(new Rect(0, 0, 120, 40), $"{waitForInAir}, {touchingGround}");
+        GUI.Label(new Rect(0, 0, 120, 40), $"{velocity}, {touchingGround}");
     }
 
     private void Update()
@@ -47,7 +48,7 @@ public class FirstPersonController : MonoBehaviour
 
         if (touchingGround && Input.GetButton("Jump"))
         {
-            velocity.y += JumpHeight * -2 * Physics.gravity.y;
+            velocity.y = JumpHeight;
         }
 
         float pitch = _pitch - Input.GetAxisRaw("Mouse Y") * MouseSensitivity;
@@ -64,6 +65,8 @@ public class FirstPersonController : MonoBehaviour
         touchingGround = (flags & CollisionFlags.Below) == CollisionFlags.Below;
         if (!touchingGround)
             velocity += Physics.gravity * Time.fixedDeltaTime;
+        else
+            velocity.y = -0.1f;
         //rig.MovePosition(rig.position + input * Time.fixedDeltaTime * Speed);
         input = Vector3.zero;
     }
