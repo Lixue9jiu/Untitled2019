@@ -14,7 +14,6 @@ public interface IMeshBuilder
     /// <param name="cb">Cb.</param>
     /// <param name="cc">Cc.</param>
     /// <param name="cd">Cd.</param>
-    void ShadedQuad(Vector3Int pos, int face, Rect tex, Color ca, Color cb, Color cc, Color cd, bool[] neighbors, bool[] corners);
-    void Quad(Vector3Int pos, int face, Rect tex, Color ca, Color cb, Color cc, Color cd);
+    void Quad(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Rect tex, Color ca, Color cb, Color cc, Color cd);
     void Mesh(Vector3Int pos, Mesh mesh);
 }

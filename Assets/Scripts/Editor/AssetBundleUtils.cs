@@ -14,6 +14,8 @@ public static class AssetBundleUtils
         }
 #if UNITY_ANDROID
         BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath, BuildAssetBundleOptions.None, BuildTarget.Android);
+#elif UNITY_STANDALONE_OSX
+        BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath, BuildAssetBundleOptions.None, BuildTarget.StandaloneOSX);
 #endif
     }
 }

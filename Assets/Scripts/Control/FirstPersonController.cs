@@ -14,7 +14,6 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField]
     private LayerMask Ground;
     private CharacterController chara;
-    private Vector3 input;
     private float _pitch;
     private bool touchingGround;
 
@@ -37,20 +36,8 @@ public class FirstPersonController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
-    private void OnGUI()
-    {
-        GUI.Label(new Rect(0, 0, 120, 40), $"{velocity}, {touchingGround}");
-    }
-
     private void Update()
     {
-        input += transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal");
-
-        if (touchingGround && Input.GetButton("Jump"))
-        {
-            velocity.y = JumpHeight;
-        }
-
         float pitch = _pitch - Input.GetAxisRaw("Mouse Y") * MouseSensitivity;
         pitch = Mathf.Clamp(pitch, -85, 85);
         cameraTransform.Rotate(new Vector3(pitch - _pitch, 0, 0), Space.Self);
@@ -61,13 +48,19 @@ public class FirstPersonController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        var flags = chara.Move((input + velocity) * Time.fixedDeltaTime);
+        var input = (transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")) * Speed * Time.fixedDeltaTime;
+
+        var flags = chara.Move(velocity * Time.fixedDeltaTime + input);
         touchingGround = (flags & CollisionFlags.Below) == CollisionFlags.Below;
         if (!touchingGround)
             velocity += Physics.gravity * Time.fixedDeltaTime;
         else
             velocity.y = -0.1f;
+        velocity -= velocity.normalized * velocity.sqrMagnitude * 0.0005f;
+        if (touchingGround && Input.GetButton("Jump"))
+        {
+            velocity.y = JumpHeight;
+        }
         //rig.MovePosition(rig.position + input * Time.fixedDeltaTime * Speed);
-        input = Vector3.zero;
     }
 }
