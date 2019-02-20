@@ -52,7 +52,7 @@ public class MainThread : MonoBehaviour
             GetComponent<TerrainRenderer>().AddChunkStackToRender(i & 3, i >> 2);
         }
     }
-
+    
     private void GenerateTerrain(int ox, int oz, ChunkStack chunk)
     {
         var block = GetComponent<BlockManager>();

@@ -39,4 +39,9 @@ public class TerrainManager : MonoBehaviour
     {
         return m_yChunkCount[new Vector2Int(x, z)];
     }
+
+    public int GetCellValue(int x, int y, int z)
+    {
+        return GetChunk(x >> Chunk.SHIFT_X, y >> Chunk.SHIFT_Y, z >> Chunk.SHIFT_Z)[x & Chunk.SIZE_X_MINUS_ONE, y & Chunk.SIZE_Y_MINUS_ONE, z & Chunk.SIZE_Z_MINUS_ONE];
+    }
 }

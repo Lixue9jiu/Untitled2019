@@ -3,6 +3,7 @@ using System.Collections;
 
 public class BlockRenderContext
 {
+    public Vector3Int origin;
     /// <summary>
     /// The chunk containing the block
     /// </summary>
@@ -15,4 +16,8 @@ public class BlockRenderContext
     /// The block manager.
     /// </summary>
     public BlockManager blockManager;
+    /// <summary>
+    /// The terrain manager.
+    /// </summary>
+    public TerrainManager terrainManager;
 }

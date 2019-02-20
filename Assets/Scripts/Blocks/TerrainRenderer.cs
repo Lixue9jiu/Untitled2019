@@ -72,10 +72,10 @@ public class TerrainRenderer : MonoBehaviour
 
     public void AddChunkToRender(int x, int y, int z)
     {
-        var instance = new ChunkInstance { mesh = BuildMesh(x, y, z), matrix = Matrix4x4.Translate(new Vector3(x << 4, y << 4, z << 4)) };
+        var instance = new ChunkInstance { mesh = BuildMesh(x, y, z), matrix = Matrix4x4.Translate(new Vector3(x << Chunk.SHIFT_X, y << Chunk.SHIFT_Y, z << Chunk.SHIFT_Z)) };
         instance.collider = Instantiate(chunkPrefab, terrian.transform).GetComponent<MeshCollider>();
         instance.collider.sharedMesh = BuildBoundingMesh(x, y, z);
-        instance.collider.transform.position = new Vector3(x << 4, y << 4, z << 4);
+        instance.collider.transform.position = new Vector3(x << Chunk.SHIFT_X, y << Chunk.SHIFT_Y, z << Chunk.SHIFT_Z);
         if (freeIndices.Count == 0)
         {
             m_terrainManager.GetChunk(x, y, z).RenderIndex = instances.Count;
@@ -229,7 +229,15 @@ public class TerrainRenderer : MonoBehaviour
             {
                 for (int z = 0; z < Chunk.SIZE_Z; z++)
                 {
-                    m_renderers[BlockData.GetContent(chunk[x, y, z])]?.Render(new BlockRenderContext { chunk = chunk, neighbors = neighbors, blockManager = m_blockManager }, new Vector3Int(x, y, z), builder);
+                    var context = new BlockRenderContext
+                    {
+                        origin = new Vector3Int(cx << Chunk.SHIFT_X, cy << Chunk.SHIFT_Y, cz << Chunk.SHIFT_Z),
+                        chunk = chunk,
+                        neighbors = neighbors,
+                        blockManager = m_blockManager,
+                        terrainManager = m_terrainManager
+                    };
+                    m_renderers[BlockData.GetContent(chunk[x, y, z])]?.Render(context, new Vector3Int(x, y, z), builder);
                 }
             }
         }
