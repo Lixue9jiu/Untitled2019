@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Unity.Collections;
 using System.Collections;
 
 /// <summary>
@@ -23,7 +24,7 @@ public class Chunk
 
     public static readonly Chunk airChunk = new Chunk();
 
-    public int RenderIndex;
+    public int RenderIndex = -1;
 
     int[] cells;
 
@@ -71,5 +72,10 @@ public class Chunk
     public static int GetIndex(int x, int y, int z)
     {
         return x + (y << DATA_SHIFT_Y) + (z << DATA_SHIFT_Z);
+    }
+
+    public NativeArray<int> ToNativeArray(Allocator alloc)
+    {
+        return new NativeArray<int>(cells, alloc);
     }
 }

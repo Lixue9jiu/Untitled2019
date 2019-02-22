@@ -52,11 +52,13 @@ public class FirstPersonController : MonoBehaviour
 
         var flags = chara.Move(velocity * Time.fixedDeltaTime + input);
         touchingGround = (flags & CollisionFlags.Below) == CollisionFlags.Below;
+        if ((flags & CollisionFlags.Above) == CollisionFlags.Above)
+            velocity.y = 0;
         if (!touchingGround)
             velocity += Physics.gravity * Time.fixedDeltaTime;
         else
             velocity.y = -0.1f;
-        velocity -= velocity.normalized * velocity.sqrMagnitude * 0.0005f;
+        velocity -= velocity.normalized * velocity.sqrMagnitude * 0.0007f;
         if (touchingGround && Input.GetButton("Jump"))
         {
             velocity.y = JumpHeight;

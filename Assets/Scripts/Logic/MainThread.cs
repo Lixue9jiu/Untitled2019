@@ -4,9 +4,18 @@ using UnityEngine;
 
 public class MainThread : MonoBehaviour
 {
+    [SerializeField]
+    FirstPersonController player;
+
     private void Start()
     {
         Test1();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+            player.enabled = !player.enabled;
     }
 
     private void Test0()

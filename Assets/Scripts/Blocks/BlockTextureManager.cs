@@ -38,10 +38,10 @@ public class BlockTextureManager : MonoBehaviour
             for (int k = 0; k < texs.Length; k++)
             {
                 src.SetPixels((k & 15) * texSize, (k >> 4) * texSize, texSize, texSize, texs[k].GetPixels(i), i);
-                texCoords[texs[k].name] = new Rect(0.0625f * (k & 15) + 0.0001f, 0.0625f * (k >> 4) + 0.0001f, 0.0623f, 0.0623f);
+                texCoords[texs[k].name] = GenerateTexCoord(k);
             }
         }
-        texCoords["Error"] = new Rect(0.0625f * texs.Length, 0.0625f * texs.Length, 0.0625f, 0.0625f);
+        texCoords["Error"] = GenerateTexCoord(texs.Length);
         src.Apply(true, apply);
     }
 
@@ -50,5 +50,10 @@ public class BlockTextureManager : MonoBehaviour
         if (!texCoords.ContainsKey(name))
             throw new System.Exception($"block texture {name} not found");
         return texCoords[name];
+    }
+
+    private static Rect GenerateTexCoord(int index)
+    {
+        return new Rect(0.0625f * (index & 15) + 0.001f, 0.0625f * (index >> 4) + 0.001f, 0.0605f, 0.0605f);
     }
 }

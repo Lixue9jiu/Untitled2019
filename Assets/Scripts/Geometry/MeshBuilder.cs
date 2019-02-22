@@ -9,6 +9,14 @@ public class MeshBuilder : IMeshBuilder
     List<Vector2> uvs = new List<Vector2>();
     List<Color> colors = new List<Color>();
 
+    public void ToMesh(Mesh mesh)
+    {
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = indices.ToArray();
+        mesh.uv = uvs.ToArray();
+        mesh.colors = colors.ToArray();
+    }
+
     public Mesh ToMesh()
     {
         return new Mesh

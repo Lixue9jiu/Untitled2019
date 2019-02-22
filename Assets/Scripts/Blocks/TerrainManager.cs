@@ -44,4 +44,31 @@ public class TerrainManager : MonoBehaviour
     {
         return GetChunk(x >> Chunk.SHIFT_X, y >> Chunk.SHIFT_Y, z >> Chunk.SHIFT_Z)[x & Chunk.SIZE_X_MINUS_ONE, y & Chunk.SIZE_Y_MINUS_ONE, z & Chunk.SIZE_Z_MINUS_ONE];
     }
+
+    public void SetCellValue(int x, int y, int z, int value)
+    {
+        var point = new Vector3Int(x >> Chunk.SHIFT_X, y >> Chunk.SHIFT_Y, z >> Chunk.SHIFT_Z);
+        if (m_chunks.TryGetValue(point, out Chunk c))
+        {
+            c[x & Chunk.SIZE_X_MINUS_ONE, y & Chunk.SIZE_Y_MINUS_ONE, z & Chunk.SIZE_Z_MINUS_ONE] = value;
+
+            var r = GetComponent<TerrainRenderer>();
+            r.QueueChunkUpdate(point.x, point.y, point.z);
+
+            //if (x == Chunk.SIZE_X_MINUS_ONE)
+            //    r.UpdateChunk(point.x + 1, point.y, point.z);
+            //else if (x == 0)
+            //    r.UpdateChunk(point.x - 1, point.y, point.z);
+
+            //if (y == Chunk.SIZE_Y_MINUS_ONE)
+            //    r.UpdateChunk(point.x, point.y + 1, point.z);
+            //else if (y == 0)
+            //    r.UpdateChunk(point.x, point.y - 1, point.z);
+
+            //if (z == Chunk.SIZE_Z_MINUS_ONE)
+            //    r.UpdateChunk(point.x, point.y, point.z + 1);
+            //else if (z == 0)
+                //r.UpdateChunk(point.x, point.y, point.z - 1);
+        }
+    }
 }
