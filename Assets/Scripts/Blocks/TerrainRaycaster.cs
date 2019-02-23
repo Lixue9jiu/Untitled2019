@@ -38,7 +38,7 @@ public class TerrainRaycaster : MonoBehaviour
             cube.transform.position = result.Value.point + new Vector3(0.5f, 0.5f, 0.5f);
         }
 
-        if (cooldownReady && Input.GetKey(KeyCode.Mouse0) && result.HasValue)
+        if (Input.GetKey(KeyCode.Mouse0) && result.HasValue)
         {
             var pos = result.Value.point;
             m_terrain.SetCellValue(pos.x, pos.y, pos.z, 0);

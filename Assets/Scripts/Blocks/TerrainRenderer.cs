@@ -15,8 +15,6 @@ public class TerrainRenderer : MonoBehaviour
     List<ChunkInstance> instances = new List<ChunkInstance>();
     Queue<int> freeIndices = new Queue<int>();
 
-    Queue<Vector3Int> chunksToBuild = new Queue<Vector3Int>();
-
     [SerializeField]
     Material opaueMaterial;
 
@@ -25,6 +23,8 @@ public class TerrainRenderer : MonoBehaviour
 
     [SerializeField]
     GameObject chunkPrefab;
+
+    HashSet<int> chunksInProcess = new HashSet<int>();
 
     class ChunkInstance
     {
@@ -46,7 +46,7 @@ public class TerrainRenderer : MonoBehaviour
         opaueMaterial.mainTexture = GetComponent<BlockTextureManager>().MainTexture;
     }
 
-    private async Task Update()
+    private void Update()
     {
         int count = 0;
         for (int i = 0; i < instances.Count; i++)
@@ -56,18 +56,6 @@ public class TerrainRenderer : MonoBehaviour
                 count++;
                 Graphics.DrawMesh(instances[i].mesh, instances[i].matrix, opaueMaterial, 0);
             }
-        }
-        GetComponent<LabelRenderer>().AddLabel(count + "");
-
-        if (chunksToBuild.Count != 0)
-        {
-            var p = chunksToBuild.Dequeue();
-            Mesh m = await Task.Run(() => BuildMesh(p.x, p.y, p.z));
-            int index = m_terrainManager.GetChunk(p.x, p.y, p.z).RenderIndex;
-            if (index == -1)
-                return;
-            instances[index].mesh = m;
-            instances[index].collider.sharedMesh = m;
         }
     }
 
@@ -91,9 +79,8 @@ public class TerrainRenderer : MonoBehaviour
 
     public void AddChunkToRender(int x, int y, int z)
     {
-        var instance = new ChunkInstance { mesh = BuildMesh(x, y, z), matrix = Matrix4x4.Translate(new Vector3(x << Chunk.SHIFT_X, y << Chunk.SHIFT_Y, z << Chunk.SHIFT_Z)) };
+        var instance = new ChunkInstance { matrix = Matrix4x4.Translate(new Vector3(x << Chunk.SHIFT_X, y << Chunk.SHIFT_Y, z << Chunk.SHIFT_Z)) };
         instance.collider = Instantiate(chunkPrefab, terrian.transform).GetComponent<MeshCollider>();
-        instance.collider.sharedMesh = BuildBoundingMesh(x, y, z);
         instance.collider.transform.position = new Vector3(x << Chunk.SHIFT_X, y << Chunk.SHIFT_Y, z << Chunk.SHIFT_Z);
         if (freeIndices.Count == 0)
         {
@@ -106,6 +93,7 @@ public class TerrainRenderer : MonoBehaviour
             m_terrainManager.GetChunk(x, y, z).RenderIndex = index;
             instances[index] = instance;
         }
+        QueueChunkUpdate(x, y, z);
     }
 
     public void RemoveChunkFromRender(int x, int y, int z)
@@ -125,16 +113,26 @@ public class TerrainRenderer : MonoBehaviour
 
     public void QueueChunkUpdate(int x, int y, int z)
     {
-        chunksToBuild.Enqueue(new Vector3Int(x, y, z));
+        int index = m_terrainManager.GetChunk(x, y, z).RenderIndex;
+        if (index == -1 || chunksInProcess.Contains(index))
+            return;
+        chunksInProcess.Add(index);
+        var builder = new MeshBuilder();
+        var cb = new ColliderMeshBuilder();
+        GetComponent<TaskManager>().CreateWork(UpdateChunk, new object[] { new Vector3Int(x, y, z), builder, cb }, () =>
+        {
+            chunksInProcess.Remove(index);
+            instances[index].mesh = builder.ToMesh();
+            instances[index].collider.sharedMesh = cb.ToMesh();
+        });
     }
 
-    public void UpdateChunk(int x, int y, int z)
+    public void UpdateChunk(object obj)
     {
-        int index = m_terrainManager.GetChunk(x, y, z).RenderIndex;
-        if (index == -1)
-            return;
-        instances[index].mesh = BuildMesh(x, y, z);
-        instances[index].collider.sharedMesh = instances[index].mesh;
+        var data = (object[])obj;
+        var p = (Vector3Int)data[0];
+        BuildMesh((MeshBuilder)data[1], p.x, p.y, p.z);
+        BuildBoundingMesh((ColliderMeshBuilder)data[2], p.x, p.y, p.z);
     }
 
     /// <summary>
@@ -144,7 +142,7 @@ public class TerrainRenderer : MonoBehaviour
     /// <param name="cx">chunkx</param>
     /// <param name="cy">chunky</param>
     /// <param name="cz">chunkz</param>
-    private Mesh BuildBoundingMesh(int cx, int cy, int cz)
+    private void BuildBoundingMesh(ColliderMeshBuilder builder, int cx, int cy, int cz)
     {
         var chunk = m_terrainManager.GetChunk(cx, cy, cz);
         Chunk[] neighbors =
@@ -159,7 +157,6 @@ public class TerrainRenderer : MonoBehaviour
 
         Vector3Int dim = new Vector3Int(Chunk.SIZE_X, Chunk.SIZE_Y, Chunk.SIZE_Z);
         Vector3Int dimShift = new Vector3Int(Chunk.SIZE_X_MINUS_ONE, Chunk.SIZE_Y_MINUS_ONE, Chunk.SIZE_Z_MINUS_ONE);
-        ColliderMeshBuilder builder = new ColliderMeshBuilder();
         for (int d = 0; d < 3; d++)
         {
             int u = (d + 1) % 3;
@@ -248,12 +245,9 @@ public class TerrainRenderer : MonoBehaviour
                 }
             }
         }
-        var result = builder.ToMesh();
-        result.RecalculateNormals();
-        return result;
     }
 
-    private Mesh BuildMesh(int cx, int cy, int cz)
+    private void BuildMesh(MeshBuilder builder, int cx, int cy, int cz)
     {
         var chunk = m_terrainManager.GetChunk(cx, cy, cz);
         Chunk[] neighbors =
@@ -265,7 +259,6 @@ public class TerrainRenderer : MonoBehaviour
             m_terrainManager.GetChunk(cx, cy, cz + 1),
             m_terrainManager.GetChunk(cx, cy, cz - 1)
         };
-        MeshBuilder builder = new MeshBuilder();
         var origin = new Vector3Int(cx << Chunk.SHIFT_X, cy << Chunk.SHIFT_Y, cz << Chunk.SHIFT_Z);
         for (int x = 0; x < Chunk.SIZE_X; x++)
         {
@@ -285,6 +278,5 @@ public class TerrainRenderer : MonoBehaviour
                 }
             }
         }
-        return builder.ToMesh();
     }
 }

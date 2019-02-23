@@ -55,20 +55,24 @@ public class TerrainManager : MonoBehaviour
             var r = GetComponent<TerrainRenderer>();
             r.QueueChunkUpdate(point.x, point.y, point.z);
 
-            //if (x == Chunk.SIZE_X_MINUS_ONE)
-            //    r.UpdateChunk(point.x + 1, point.y, point.z);
-            //else if (x == 0)
-            //    r.UpdateChunk(point.x - 1, point.y, point.z);
+            x &= Chunk.SIZE_X_MINUS_ONE;
+            y &= Chunk.SIZE_Y_MINUS_ONE;
+            z &= Chunk.SIZE_Z_MINUS_ONE;
 
-            //if (y == Chunk.SIZE_Y_MINUS_ONE)
-            //    r.UpdateChunk(point.x, point.y + 1, point.z);
-            //else if (y == 0)
-            //    r.UpdateChunk(point.x, point.y - 1, point.z);
+            if (x == Chunk.SIZE_X_MINUS_ONE)
+                r.QueueChunkUpdate(point.x + 1, point.y, point.z);
+            else if (x == 0)
+                r.QueueChunkUpdate(point.x - 1, point.y, point.z);
 
-            //if (z == Chunk.SIZE_Z_MINUS_ONE)
-            //    r.UpdateChunk(point.x, point.y, point.z + 1);
-            //else if (z == 0)
-                //r.UpdateChunk(point.x, point.y, point.z - 1);
+            if (y == Chunk.SIZE_Y_MINUS_ONE)
+                r.QueueChunkUpdate(point.x, point.y + 1, point.z);
+            else if (y == 0)
+                r.QueueChunkUpdate(point.x, point.y - 1, point.z);
+
+            if (z == Chunk.SIZE_Z_MINUS_ONE)
+                r.QueueChunkUpdate(point.x, point.y, point.z + 1);
+            else if (z == 0)
+                r.QueueChunkUpdate(point.x, point.y, point.z - 1);
         }
     }
 }
