@@ -2,17 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CrossPlatfromInput : MonoBehaviour
+public static class CrossPlatfromInput
 {
-    // Start is called before the first frame update
-    void Start()
+    static Dictionary<string, float> axis = new Dictionary<string, float>();
+
+    public static void SetAxis(string name, float value)
     {
-        
+#if UNITY_ANDROID
+        axis[name] = value;
+#endif
     }
 
-    // Update is called once per frame
-    void Update()
+    public static float GetAxis(string name)
     {
-        
+        if (!axis.ContainsKey(name))
+            axis[name] = 0;
+#if UNITY_ANDROID
+        return axis[name];
+#else
+        return Input.GetAxis(name);
+#endif
     }
 }

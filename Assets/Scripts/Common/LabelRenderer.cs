@@ -7,6 +7,13 @@ public class LabelRenderer : MonoBehaviour
     List<string> labels = new List<string>();
     bool isDirty;
 
+    static LabelRenderer instance;
+
+    public static void AddLabel(object obj)
+    {
+        instance.AddLabel(obj.ToString());
+    }
+
     public void AddLabel(string str)
     {
         if (isDirty)
@@ -22,6 +29,12 @@ public class LabelRenderer : MonoBehaviour
 
     private void Start()
     {
+        if (instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
         InvokeRepeating("UpdateFPS", 0, 1.5f);
     }
 

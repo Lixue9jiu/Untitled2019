@@ -15,7 +15,7 @@ public class FirstPersonController : MonoBehaviour
     private LayerMask Ground;
     private CharacterController chara;
     private float _pitch;
-    private bool m_applyGravity;
+    private bool m_applyGravity = true;
 
     private Vector3 velocity;
 
@@ -24,6 +24,7 @@ public class FirstPersonController : MonoBehaviour
         chara = GetComponent<CharacterController>();
     }
 
+#if !UNITY_ANDROID
     private void OnEnable()
     {
         Cursor.visible = false;
@@ -35,6 +36,7 @@ public class FirstPersonController : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
+#endif
 
     private void Update()
     {
@@ -51,11 +53,11 @@ public class FirstPersonController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector3 input = (transform.forward * Input.GetAxis("Vertical") + transform.right * Input.GetAxis("Horizontal")) * Speed * Time.fixedDeltaTime;
+        Vector3 input = (transform.forward * CrossPlatfromInput.GetAxis("Vertical") + transform.right * CrossPlatfromInput.GetAxis("Horizontal")) * Speed * Time.fixedDeltaTime;
 
         if (!m_applyGravity)
         {
-            input.y = Input.GetAxis("Fly") * Time.fixedDeltaTime;
+            input.y = Input.GetAxis("Fly") * Speed * Time.fixedDeltaTime;
             input *= 4;
         }
 
@@ -67,7 +69,7 @@ public class FirstPersonController : MonoBehaviour
         if (m_applyGravity)
         {
             if (!touchingGround)
-                velocity += Physics.gravity * Speed * Time.fixedDeltaTime;
+                velocity += Physics.gravity * Time.fixedDeltaTime;
             else
                 velocity.y = -0.1f;
         }

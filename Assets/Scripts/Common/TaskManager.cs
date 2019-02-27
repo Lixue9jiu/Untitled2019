@@ -18,8 +18,7 @@ public class TaskManager : MonoBehaviour
     }
 
     Queue<WorkHandle> m_messageQueue = new Queue<WorkHandle>();
-
-    object m_lock = new object();
+    readonly object m_lock = new object();
 
     public void CreateWork(Action<object> work, object obj, Action callback)
     {

@@ -24,8 +24,6 @@ public class TerrainRenderer : MonoBehaviour
     [SerializeField]
     GameObject chunkPrefab;
 
-    HashSet<int> chunksInProcess = new HashSet<int>();
-
     class ChunkInstance
     {
         public Mesh mesh;
@@ -48,12 +46,10 @@ public class TerrainRenderer : MonoBehaviour
 
     private void Update()
     {
-        int count = 0;
         for (int i = 0; i < instances.Count; i++)
         {
             if (instances[i] != null)
             {
-                count++;
                 Graphics.DrawMesh(instances[i].mesh, instances[i].matrix, opaueMaterial, 0);
             }
         }
@@ -114,16 +110,17 @@ public class TerrainRenderer : MonoBehaviour
     public void QueueChunkUpdate(int x, int y, int z)
     {
         int index = m_terrainManager.GetChunk(x, y, z).RenderIndex;
-        if (index == -1 || chunksInProcess.Contains(index))
+        if (index == -1)
             return;
-        chunksInProcess.Add(index);
-        var builder = new MeshBuilder();
+
+        var mb = new MeshBuilder();
         var cb = new ColliderMeshBuilder();
-        GetComponent<TaskManager>().CreateWork(UpdateChunk, new object[] { new Vector3Int(x, y, z), builder, cb }, () =>
+        GetComponent<TaskManager>().CreateWork(UpdateChunk, new object[] { new Vector3Int(x, y, z), mb, cb }, () =>
         {
-            chunksInProcess.Remove(index);
-            instances[index].mesh = builder.ToMesh();
+            instances[index].mesh = mb.ToMesh();
             instances[index].collider.sharedMesh = cb.ToMesh();
+            mb.Clear();
+            cb.Clear();
         });
     }
 
@@ -224,7 +221,7 @@ public class TerrainRenderer : MonoBehaviour
                             }
                             w++;
                         }
-                        here:
+                    here:
 
                         Vector3Int x = new Vector3Int();
                         x[d] = i + 1;

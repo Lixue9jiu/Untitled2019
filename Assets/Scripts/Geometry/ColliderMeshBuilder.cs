@@ -6,6 +6,12 @@ public class ColliderMeshBuilder
     List<Vector3> vertices = new List<Vector3>();
     List<int> indices = new List<int>();
 
+    public void Clear()
+    {
+        vertices.Clear();
+        indices.Clear();
+    }
+
     public Mesh ToMesh()
     {
         return new Mesh
