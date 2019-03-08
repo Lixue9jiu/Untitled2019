@@ -6,13 +6,20 @@ public class TerrainManager : MonoBehaviour
     Dictionary<Vector3Int, Chunk> m_chunks = new Dictionary<Vector3Int, Chunk>();
     Dictionary<Vector2Int, int> m_yChunkCount = new Dictionary<Vector2Int, int>();
 
-    public Chunk GetChunk(int x, int y, int z)
+    public ICollection<Vector3Int> ChunksPos => m_chunks.Keys;
+
+    public Chunk GetChunk(Vector3Int pos)
     {
-        if (!m_chunks.TryGetValue(new Vector3Int(x, y, z), out Chunk chunk))
+        if (!m_chunks.TryGetValue(pos, out Chunk chunk))
         {
             return Chunk.airChunk;
         }
         return chunk;
+    }
+
+    public Chunk GetChunk(int x, int y, int z)
+    {
+        return GetChunk(new Vector3Int(x, y, z));
     }
 
     public ChunkStack GetChunkStack(int x, int z)
@@ -31,6 +38,7 @@ public class TerrainManager : MonoBehaviour
         for (int i = 0; i < stack.Length; i++)
         {
             m_chunks[new Vector3Int(x, i, z)] = stack[i];
+            stack[i].RecalculateOpaques(GetComponent<BlockManager>());
         }
         m_yChunkCount[new Vector2Int(x, z)] = stack.Length;
     }

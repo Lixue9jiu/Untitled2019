@@ -24,7 +24,6 @@ public class LabelRenderer : MonoBehaviour
         labels.Add(str);
     }
 
-#if DEBUG
     float fps;
 
     private void Start()
@@ -47,7 +46,6 @@ public class LabelRenderer : MonoBehaviour
     {
         fps = 1 / Time.deltaTime;
     }
-#endif
 
     private void OnGUI()
     {

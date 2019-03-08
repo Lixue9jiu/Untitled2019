@@ -15,6 +15,8 @@ public class TerrainRenderer : MonoBehaviour
     List<ChunkInstance> instances = new List<ChunkInstance>();
     Queue<int> freeIndices = new Queue<int>();
 
+    HashSet<int> visibleChunks = new HashSet<int>();
+
     [SerializeField]
     Material opaueMaterial;
 
@@ -46,12 +48,12 @@ public class TerrainRenderer : MonoBehaviour
 
     private void Update()
     {
-        for (int i = 0; i < instances.Count; i++)
+        visibleChunks.Clear();
+        GetComponent<CullingManager>().SearchForVisible(Camera.main, visibleChunks);
+        //GetComponent<CullingManager>().NoCullingTest(visibleChunks);
+        foreach (int i in visibleChunks)
         {
-            if (instances[i] != null)
-            {
-                Graphics.DrawMesh(instances[i].mesh, instances[i].matrix, opaueMaterial, 0);
-            }
+            Graphics.DrawMesh(instances[i].mesh, instances[i].matrix, opaueMaterial, 0);
         }
     }
 

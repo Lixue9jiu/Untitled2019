@@ -43,12 +43,12 @@ public class FirstPersonController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F))
             m_applyGravity = !m_applyGravity;
 
-        float pitch = _pitch - Input.GetAxisRaw("Mouse Y") * MouseSensitivity;
+        float pitch = _pitch - CrossPlatfromInput.GetAxis("Mouse Y") * MouseSensitivity;
         pitch = Mathf.Clamp(pitch, -85, 85);
         cameraTransform.Rotate(new Vector3(pitch - _pitch, 0, 0), Space.Self);
         _pitch = pitch;
 
-        transform.Rotate(new Vector3(0, Input.GetAxisRaw("Mouse X") * MouseSensitivity, 0), Space.World);
+        transform.Rotate(new Vector3(0, CrossPlatfromInput.GetAxis("Mouse X") * MouseSensitivity, 0), Space.World);
     }
 
     private void FixedUpdate()
@@ -75,7 +75,7 @@ public class FirstPersonController : MonoBehaviour
         }
 
         velocity -= velocity.normalized * velocity.sqrMagnitude * 0.0003f;
-        if (touchingGround && Input.GetButton("Jump"))
+        if (touchingGround && CrossPlatfromInput.GetAxis("Jump") > 0)
         {
             velocity.y = JumpHeight;
         }

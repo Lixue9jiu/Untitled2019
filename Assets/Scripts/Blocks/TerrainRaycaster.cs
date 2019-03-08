@@ -6,13 +6,14 @@ public class TerrainRaycaster : MonoBehaviour
     [SerializeField]
     private LayerMask ground;
 
-    [SerializeField]
-    GameObject cube;
-
     TerrainManager m_terrain;
     BlockManager m_blockManager;
 
+#if !UNITY_ANDROID
+    [SerializeField]
+    GameObject cube;
     bool cooldownReady = true;
+#endif
 
     public struct RaycastResult
     {
@@ -27,6 +28,7 @@ public class TerrainRaycaster : MonoBehaviour
         m_blockManager = GetComponent<BlockManager>();
     }
 
+#if !UNITY_ANDROID
     private void Update()
     {
         var result = Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.5f)), 20);
@@ -52,6 +54,7 @@ public class TerrainRaycaster : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         cooldownReady = true;
     }
+#endif
 
     public RaycastResult? Raycast(Ray ray, float maxDist = 20)
     {
