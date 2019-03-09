@@ -17,6 +17,16 @@ public class TerrainManager : MonoBehaviour
         return chunk;
     }
 
+    public bool ChunkExist(Vector3Int pos)
+    {
+        return m_chunks.ContainsKey(pos);
+    }
+
+    public Chunk GetChunkFast(Vector3Int pos)
+    {
+        return m_chunks[pos];
+    }
+
     public Chunk GetChunk(int x, int y, int z)
     {
         return GetChunk(new Vector3Int(x, y, z));

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class CullingManager : MonoBehaviour
 {
     TerrainManager terrain;
+    Stack<ChunkTaskInfo> tasks = new Stack<ChunkTaskInfo>();
 
     private void Awake()
     {
@@ -34,52 +35,45 @@ public class CullingManager : MonoBehaviour
         if (originChunk.RenderIndex != -1)
             output.Add(originChunk.RenderIndex);
 
-        Stack<ChunkTaskInfo> tasks = new Stack<ChunkTaskInfo>();
         for (int i = 0; i < 6; i++)
         {
             var pos = origin + CellFace.FACES[i];
-            tasks.Push(new ChunkTaskInfo { chunk = terrain.GetChunk(pos), faceFrom = CellFace.OPPOSITE[i], pos = pos});
+            if (FrustumCull(pos, frustum))
+                tasks.Push(new ChunkTaskInfo { chunk = terrain.GetChunk(pos), faceFrom = CellFace.OPPOSITE[i], dirctFrom = CellFace.FACES[i], pos = pos});
         }
 
         while (tasks.Count > 0)
         {
             var task = tasks.Pop();
-            if (!FrustumCull(task, frustum))
-                continue;
 
             if (task.chunk.RenderIndex != -1)
             {
-                if (!output.Add(task.chunk.RenderIndex))
-                    continue;
-                for (int i = 0; i < 6; i++)
+                if (output.Add(task.chunk.RenderIndex))
                 {
-                    if (IsVisible(task, i))
+                    for (int i = 0; i < 6; i++)
                     {
-                        var pos = task.pos + CellFace.FACES[i];
-                        tasks.Push(new ChunkTaskInfo { chunk = terrain.GetChunk(pos), faceFrom = CellFace.OPPOSITE[i], pos = pos });
+                        if (Vector3.Dot(CellFace.FACES[i], task.dirctFrom) >= 0 && task.chunk.AreFacesConnected(task.faceFrom, i))
+                        {
+                            var pos = task.pos + CellFace.FACES[i];
+                            if (terrain.ChunkExist(pos) && FrustumCull(pos, frustum))
+                            {
+                                tasks.Push(new ChunkTaskInfo { chunk = terrain.GetChunkFast(pos), faceFrom = CellFace.OPPOSITE[i], dirctFrom = pos - origin, pos = pos });
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    private bool IsVisible(ChunkTaskInfo info, int nextFace)
+    private bool FrustumCull(Vector3Int pos, Plane[] frustum)
     {
-        return nextFace != info.faceFrom && info.chunk.AreFacesConnected(info.faceFrom, nextFace);
+        return GeometryUtility.TestPlanesAABB(frustum, new Bounds(pos * 16 + new Vector3Int(8, 8, 8), new Vector3Int(16, 16, 16)));
     }
 
-    private bool FrustumCull(ChunkTaskInfo info, Plane[] frustum)
+    struct ChunkTaskInfo
     {
-        return GeometryUtility.TestPlanesAABB(frustum, new Bounds(info.pos * 16 + new Vector3Int(8, 8, 8), new Vector3Int(16, 16, 16)));
-    }
-
-    private bool ViewTest(Vector3 v)
-    {
-        return v.x > -1 && v.x < 1 && v.y > -1 && v.y < 1;
-    }
-
-    class ChunkTaskInfo
-    {
+        public Vector3 dirctFrom;
         public int faceFrom;
         public Vector3Int pos;
         public Chunk chunk;

@@ -46,11 +46,15 @@ public class TerrainRenderer : MonoBehaviour
         opaueMaterial.mainTexture = GetComponent<BlockTextureManager>().MainTexture;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         visibleChunks.Clear();
         GetComponent<CullingManager>().SearchForVisible(Camera.main, visibleChunks);
         //GetComponent<CullingManager>().NoCullingTest(visibleChunks);
+    }
+
+    private void Update()
+    {
         foreach (int i in visibleChunks)
         {
             Graphics.DrawMesh(instances[i].mesh, instances[i].matrix, opaueMaterial, 0);
