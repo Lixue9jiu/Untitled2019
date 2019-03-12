@@ -32,7 +32,7 @@ public class Chunk
 
     public bool AreFacesConnected(int a, int b)
     {
-        return opaqueMask[Mathf.Min(a, b) * 6 + Mathf.Max(a, b)];
+        return opaqueMask[a * 6 + b];
     }
 
     int[] cells;
@@ -105,7 +105,10 @@ public class Chunk
                             if (faceFlag[i])
                                 for (int k = i; k < 6; k++)
                                     if (faceFlag[k])
+                                    {
+                                        result[k * 6 + i] = true;
                                         result[i * 6 + k] = true;
+                                    }
                     }
                 }
         opaqueMask = result;

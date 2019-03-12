@@ -22,13 +22,14 @@ public class CullingManager : MonoBehaviour
     }
 
     /// <summary>
-    /// look for visible chunks
+    /// look for visible chunks for the camera, the result will be export to the hashset
     /// </summary>
     /// <param name="c">C.</param>
     /// <param name="output">Output.</param>
     public void SearchForVisible(Camera c, HashSet<int> output)
     {
         var frustum = GeometryUtility.CalculateFrustumPlanes(c);
+        var forward = c.transform.forward;
 
         var origin = Vector3Int.FloorToInt(c.transform.position / 16);
         var originChunk = terrain.GetChunk(origin);
@@ -48,17 +49,17 @@ public class CullingManager : MonoBehaviour
 
             if (task.chunk.RenderIndex != -1)
             {
-                if (output.Add(task.chunk.RenderIndex))
+                output.Add(task.chunk.RenderIndex);
+                for (int i = 0; i < 6; i++)
                 {
-                    for (int i = 0; i < 6; i++)
+                    var pos = task.pos + CellFace.FACES[i];
+                    if (terrain.ChunkExist(pos))
                     {
-                        if (Vector3.Dot(CellFace.FACES[i], task.dirctFrom) >= 0 && task.chunk.AreFacesConnected(task.faceFrom, i))
+                        var chunk = terrain.GetChunkFast(pos);
+                        if (!output.Contains(chunk.RenderIndex) && task.chunk.AreFacesConnected(task.faceFrom, i) && Vector3.Dot(CellFace.FACES[i], task.dirctFrom) >= 0)
                         {
-                            var pos = task.pos + CellFace.FACES[i];
-                            if (terrain.ChunkExist(pos) && FrustumCull(pos, frustum))
-                            {
-                                tasks.Push(new ChunkTaskInfo { chunk = terrain.GetChunkFast(pos), faceFrom = CellFace.OPPOSITE[i], dirctFrom = pos - origin, pos = pos });
-                            }
+                            if (FrustumCull(pos, frustum))
+                                tasks.Push(new ChunkTaskInfo { chunk = chunk, faceFrom = CellFace.OPPOSITE[i], dirctFrom = pos - origin, pos = pos });
                         }
                     }
                 }
