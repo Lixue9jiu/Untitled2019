@@ -10,6 +10,7 @@ public class MainThread : MonoBehaviour
     private void Start()
     {
         Test2();
+        Debug.Log(CullingManager.GetChunkFacePos(0, Vector3Int.one));
     }
 
     Vector3Int[] chunks = new Vector3Int[0];
@@ -18,15 +19,6 @@ public class MainThread : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             player.enabled = !player.enabled;
-
-        //if (Input.GetKeyDown(KeyCode.Q))
-        //{
-        //    var pos = Vector3Int.FloorToInt(Camera.main.transform.position / 16);
-        //    var list = new List<Vector3Int>();
-        //    GetComponent<CullingManager>().SearchForVisible(pos, Camera.main.transform.forward, list);
-        //    Debug.Log(string.Join(", ", list));
-        //    chunks = list.ToArray();
-        //}
     }
 
     private void OnDrawGizmos()

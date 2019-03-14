@@ -15,9 +15,9 @@ public static class CrossPlatfromInput
 
     public static float GetAxis(string name)
     {
+#if UNITY_ANDROID && !UNITY_EDITOR
         if (!axis.ContainsKey(name))
             axis[name] = 0;
-#if UNITY_ANDROID
         return axis[name];
 #else
         return Input.GetAxis(name);

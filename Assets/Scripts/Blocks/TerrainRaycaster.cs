@@ -96,6 +96,17 @@ public class TerrainRaycaster : MonoBehaviour
         int dim = 0;
         while (dist < maxDist)
         {
+            int value = m_terrain.GetCellValue(map.x, map.y, map.z);
+            if (value != 0)
+            {
+                return new RaycastResult
+                {
+                    point = map,
+                    face = dim * 2 + (step[dim] + 1) / 2,
+                    value = value
+                };
+            }
+
             Min(side.x, side.y, side.z, out dim);
             switch (dim)
             {
@@ -111,17 +122,6 @@ public class TerrainRaycaster : MonoBehaviour
                     map.z += step.z;
                     side.z += delta.z;
                     break;
-            }
-
-            int value = m_terrain.GetCellValue(map.x, map.y, map.z);
-            if (value != 0)
-            {
-                return new RaycastResult
-                {
-                    point = map,
-                    face = dim * 2 + (step[dim] + 1) / 2,
-                    value = value
-                };
             }
             dist++;
         }

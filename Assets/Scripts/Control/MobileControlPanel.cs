@@ -6,7 +6,7 @@ public class MobileControlPanel : MonoBehaviour, IPointerUpHandler, IPointerDown
 {
     const float SHORT_TAP_TIME = 0.2f;
     const float LONG_HOLD_TIME = 0.7f;
-    const float LONG_HOLD_MIN_OFFSET = 1f;
+    const float LONG_HOLD_MIN_OFFSET = 16f;
     const float MOUSE_OFFSET_DIVIDER = 8;
 
     int screenWidth;

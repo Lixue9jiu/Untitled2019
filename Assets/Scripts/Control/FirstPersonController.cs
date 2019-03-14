@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-// TODO: fix the jump
-// TODO: fix the gravity while on ground
 [RequireComponent(typeof(CharacterController))]
 public class FirstPersonController : MonoBehaviour
 {
@@ -24,7 +22,7 @@ public class FirstPersonController : MonoBehaviour
         chara = GetComponent<CharacterController>();
     }
 
-#if !UNITY_ANDROID
+#if UNITY_EDITOR || !UNITY_ANDROID
     private void OnEnable()
     {
         Cursor.visible = false;
@@ -57,6 +55,7 @@ public class FirstPersonController : MonoBehaviour
 
         if (!m_applyGravity)
         {
+            velocity.y = 0;
             input.y = Input.GetAxis("Fly") * Speed * Time.fixedDeltaTime;
             input *= 4;
         }
