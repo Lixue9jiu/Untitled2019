@@ -15,7 +15,7 @@
       texture: Stone
     - !cubeBlock
       name: Dirt
-      texture: Dirt
+      texture: Dirt*
     - !cubeBlock
       name: Grass
-      texture: GrassSide GrassSide Grass Dirt GrassSide GrassSide
+      texture: GrassSide GrassSide Grass* Dirt* GrassSide GrassSide

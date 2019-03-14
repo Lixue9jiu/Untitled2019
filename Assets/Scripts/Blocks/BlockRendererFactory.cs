@@ -59,20 +59,32 @@ public class BlockRendererFactory : MonoBehaviour
         var texManager = GetComponent<BlockTextureManager>();
         if (args.Length == 1)
         {
+            bool useRandom = false;
+            if (args[0][args[0].Length - 1] == '*')
+            {
+                useRandom = true;
+                args[0] = args[0].Remove(args[0].Length - 1);
+            }
             Rect uv = texManager.FindBlockTexture(args[0]);
-            return new DefualtBlockRenderer(new Rect[] { uv, uv, uv, uv, uv, uv });
+            return new DefualtBlockRenderer(new Rect[] { uv, uv, uv, uv, uv, uv }, new bool[] { useRandom, useRandom, useRandom, useRandom, useRandom, useRandom });
         }
         if (args.Length == 6)
         {
             var rects = new Rect[6];
+            var useRandom = new bool[6];
             for (int i = 0; i < 6; i++)
             {
+                if (args[i][args[i].Length - 1] == '*')
+                {
+                    useRandom[i] = true;
+                    args[i] = args[i].Remove(args[i].Length - 1);
+                }
                 rects[i] = texManager.FindBlockTexture(args[i]);
             }
-            return new DefualtBlockRenderer(rects);
+            return new DefualtBlockRenderer(rects, useRandom);
         }
         Debug.LogError("wrong argument format for defualt block renderer");
         Rect e = texManager.FindBlockTexture("Error");
-        return new DefualtBlockRenderer(new Rect[] { e, e, e, e, e, e });
+        return new DefualtBlockRenderer(new Rect[] { e, e, e, e, e, e }, new bool[] { false, false, false, false, false, false });
     }
 }

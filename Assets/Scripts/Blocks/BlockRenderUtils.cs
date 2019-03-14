@@ -39,7 +39,7 @@ public static class BlockRenderUtils
         Color.white * 0.7f
     };
 
-    public static void ShadedQuad(BlockRenderContext context, IMeshBuilder builder, Vector3Int pos, int face, Rect tex, Color ca, Color cb, Color cc, Color cd)
+    public static void ShadedQuad(BlockRenderContext context, IMeshBuilder builder, Vector3Int pos, int face, Rect tex, Color ca, Color cb, Color cc, Color cd, bool randomVert)
     {
         bool[] n = GetNeighbors(context, context.origin + pos + offsets[face]);
         bool[] c = GetCorners(context, context.origin + pos);
@@ -63,7 +63,7 @@ public static class BlockRenderUtils
             colors[i] *= shadowMasks[face];
             colors[i] *= shadow;
         }
-        builder.Quad(pos + f[0], pos + f[1], pos + f[2], pos + f[3], tex, colors[0], colors[1], colors[2], colors[3]);
+        builder.Quad(pos + f[0], pos + f[1], pos + f[2], pos + f[3], tex, colors[0], colors[1], colors[2], colors[3], randomVert);
     }
 
     public static bool IsOpaque(BlockRenderContext context, int value)

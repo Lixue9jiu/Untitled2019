@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class DefualtBlockRenderer : IBlockRenderer
 {
-    private static readonly Color shadowIntensity = Color.black * 0.3f;
-
+    private bool[] m_useRandomVert;
     private Rect[] m_uvs;
 
-    public DefualtBlockRenderer(Rect[] uvs)
+    public DefualtBlockRenderer(Rect[] uvs, bool[] useRandomVert)
     {
         m_uvs = uvs;
+        m_useRandomVert = useRandomVert;
     }
 
     public void Render(BlockRenderContext context, Vector3Int pos, IMeshBuilder meshBuilder)
@@ -21,7 +20,7 @@ public class DefualtBlockRenderer : IBlockRenderer
         {
             if (value != 0 && value != neighbors[i] && !BlockRenderUtils.IsOpaque(context, neighbors[i]))
             {
-                BlockRenderUtils.ShadedQuad(context, meshBuilder, pos, i, m_uvs[i], Color.white, Color.white, Color.white, Color.white);
+                BlockRenderUtils.ShadedQuad(context, meshBuilder, pos, i, m_uvs[i], Color.white, Color.white, Color.white, Color.white, m_useRandomVert[i]);
             }
         }
     }

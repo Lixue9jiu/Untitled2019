@@ -3,7 +3,10 @@ using System.Collections.Generic;
 
 public class CullingManager : MonoBehaviour
 {
+    Bounds chunkBounds = new Bounds(Vector3.zero, new Vector3(16, 16, 16));
+
     TerrainManager terrain;
+    HashSet<Vector3Int> visitedPos = new HashSet<Vector3Int>();
     Stack<ChunkTaskInfo> tasks = new Stack<ChunkTaskInfo>();
 
     struct Line
@@ -34,6 +37,7 @@ public class CullingManager : MonoBehaviour
     /// <param name="output">Output.</param>
     public void SearchForVisible(Camera c, HashSet<int> output)
     {
+        visitedPos.Clear();
         var frustum = GeometryUtility.CalculateFrustumPlanes(c);
         var position = c.transform.position;
 
@@ -52,10 +56,11 @@ public class CullingManager : MonoBehaviour
                 for (int i = 0; i < 6; i++)
                 {
                     var pos = task.pos + CellFace.FACES[i];
-                    if (terrain.ChunkExist(pos))
+                    var chunk = terrain.GetChunk(pos);
+                    if (!output.Contains(chunk.RenderIndex))
                     {
-                        var chunk = terrain.GetChunkFast(pos);
-                        if (!output.Contains(chunk.RenderIndex) && IsFacingView(GetChunkFacePos(i, pos), CellFace.FACES[CellFace.OPPOSITE[i]], position) && (task.faceFrom == -1 || task.chunk.AreFacesConnected(task.faceFrom, i)))
+                        visitedPos.Add(pos);
+                        if (IsFacingView(GetChunkFacePos(i, pos), CellFace.FACES[CellFace.OPPOSITE[i]], position) && (task.faceFrom == -1 || task.chunk.AreFacesConnected(task.faceFrom, i)))
                         {
                             if (FrustumCull(pos, frustum))
                                 tasks.Push(new ChunkTaskInfo { chunk = chunk, faceFrom = CellFace.OPPOSITE[i], pos = pos });
@@ -88,7 +93,8 @@ public class CullingManager : MonoBehaviour
 
     private bool FrustumCull(Vector3Int pos, Plane[] frustum)
     {
-        return GeometryUtility.TestPlanesAABB(frustum, new Bounds(pos * 16 + new Vector3Int(8, 8, 8), new Vector3Int(16, 16, 16)));
+        chunkBounds.center = new Vector3(pos.x * 16 + 8, pos.y * 16 + 8, pos.z * 16 + 8);
+        return GeometryUtility.TestPlanesAABB(frustum, chunkBounds);
     }
 
     struct ChunkTaskInfo

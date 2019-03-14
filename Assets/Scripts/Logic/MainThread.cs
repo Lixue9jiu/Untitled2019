@@ -118,10 +118,34 @@ public class MainThread : MonoBehaviour
                 }
     }
 
+    private void GenerateTerrainFlat(int ox, int oz, ChunkStack chunk)
+    {
+        var block = GetComponent<BlockManager>();
+        var bedrock = block.FindBlock("game:bedrock");
+        var dirt = block.FindBlock("game:dirt");
+        var grass = block.FindBlock("game:grass");
+        for (int x = 0; x < Chunk.SIZE_X; x++)
+            for (int y = 0; y < Chunk.SIZE_Y * 4; y++)
+                for (int z = 0; z < Chunk.SIZE_Z; z++)
+                {
+                    if (y < 2)
+                        chunk[x, y, z] = bedrock;
+                    else if (y < 10)
+                        chunk[x, y, z] = dirt;
+                    else if (y < 11)
+                        chunk[x, y, z] = grass;
+                }
+    }
+
     private float GenerateHeight(int x, int y)
     {
-        return Mathf.PerlinNoise(x / 32f, y / 32f) * 10 +
-            Mathf.PerlinNoise(x / 24f, y / 24f) * 20 +
-            Mathf.PerlinNoise(x / 16f, y / 16f) * 30;
+        //return Mathf.PerlinNoise(x / 32f, y / 32f) +
+        //Mathf.PerlinNoise(x / 24f, y / 24f) * 5 +
+        //Mathf.PerlinNoise(x / 16f, y / 16f) * 10 + 
+        //Mathf.PerlinNoise(x / 8f, y / 8f) * 30;
+        return Mathf.Pow(Mathf.PerlinNoise(x / 96f, y / 96f), 4f) * 48 + 
+            Mathf.PerlinNoise(x / 64f, y / 64f) * 24 + 
+            Mathf.PerlinNoise(x / 32f, y / 32f) * 12 +
+            Mathf.PerlinNoise(x / 16f, y / 16f) * 6;
     }
 }

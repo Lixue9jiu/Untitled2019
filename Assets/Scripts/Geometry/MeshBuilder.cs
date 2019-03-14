@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MeshBuilder : IMeshBuilder
@@ -8,6 +7,8 @@ public class MeshBuilder : IMeshBuilder
     List<int> indices = new List<int>();
     List<Vector2> uvs = new List<Vector2>();
     List<Color> colors = new List<Color>();
+
+    int randomSeed = 102836;
 
     public void Clear()
     {
@@ -39,7 +40,7 @@ public class MeshBuilder : IMeshBuilder
         colors.AddRange(mesh.colors);
     }
 
-    public void Quad(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Rect tex, Color ca, Color cb, Color cc, Color cd)
+    public void Quad(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Rect tex, Color ca, Color cb, Color cc, Color cd, bool useRandomTex = false)
     {
         int count = vertices.Count;
         vertices.Add(a);
@@ -53,14 +54,32 @@ public class MeshBuilder : IMeshBuilder
         indices.Add(count + 2);
         indices.Add(count + 3);
 
-        uvs.Add(tex.min);
-        uvs.Add(new Vector2(tex.xMin, tex.yMax));
-        uvs.Add(tex.max);
-        uvs.Add(new Vector2(tex.xMax, tex.yMin));
+        if (useRandomTex)
+        {
+            var uvRect = new Vector2[] { tex.min, new Vector2(tex.xMin, tex.yMax), tex.max, new Vector2(tex.xMax, tex.yMin) };
+            int r = NextRand() & 3;
+            uvs.Add(uvRect[r]);
+            uvs.Add(uvRect[(r + 1) & 3]);
+            uvs.Add(uvRect[(r + 2) & 3]);
+            uvs.Add(uvRect[(r + 3) & 3]);
+        }
+        else
+        {
+            uvs.Add(tex.min);
+            uvs.Add(new Vector2(tex.xMin, tex.yMax));
+            uvs.Add(tex.max);
+            uvs.Add(new Vector2(tex.xMax, tex.yMin));
+        }
 
         colors.Add(ca);
         colors.Add(cb);
         colors.Add(cc);
         colors.Add(cd);
+    }
+
+    private int NextRand()
+    {
+        randomSeed = (randomSeed * 1103515245 + 12345) & 0xFFFFFFF;
+        return randomSeed;
     }
 }

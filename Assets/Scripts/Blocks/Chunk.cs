@@ -22,7 +22,7 @@ public class Chunk
     private const int DATA_SHIFT_Y = SHIFT_X;
     private const int DATA_SHIFT_Z = SHIFT_Y + SHIFT_X;
 
-    public static readonly Chunk airChunk = new Chunk();
+    public static readonly Chunk airChunk;
 
     public int RenderIndex = -1;
 
@@ -36,6 +36,15 @@ public class Chunk
     }
 
     int[] cells;
+
+    static Chunk()
+    {
+        airChunk = new Chunk();
+        for (int i = 0; i < 36; i++)
+        {
+            airChunk.opaqueMask[i] = true;
+        }
+    }
 
     public Chunk()
     {

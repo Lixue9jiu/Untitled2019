@@ -54,6 +54,6 @@ public class BlockTextureManager : MonoBehaviour
 
     private static Rect GenerateTexCoord(int index)
     {
-        return new Rect(0.0625f * (index & 15) + 0.001f, 0.0625f * (index >> 4) + 0.001f, 0.0605f, 0.0605f);
+        return new Rect(0.0625f * (index & 15), 0.0625f * (index >> 4), 0.0625f, 0.0625f);
     }
 }
