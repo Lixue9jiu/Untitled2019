@@ -3,6 +3,7 @@
   cubeBlock:
     renderer: DefualtBlockRenderer
     bounds: defualt
+    shadowStrength: 1.0
     isOpaque: true
     isTransparent: false
   meshBlock:
@@ -31,11 +32,13 @@
         texture: GrassSide GrassSide Grass* Dirt* GrassSide GrassSide
     - !meshBlock
       name: Stone Slab
+      shadowStrength: 0.5
       renderInfo:
         texture: Stone
         mesh: slab
     - !meshBlock
       name: Stone Ball
+      shadowStrength: 0.3
       renderInfo:
         texture: Stone
         mesh: ball

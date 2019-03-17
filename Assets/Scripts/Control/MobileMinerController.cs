@@ -25,7 +25,7 @@ public class MobileMinerController : MonoBehaviour
 
     private void Start()
     {
-        placeBlockValue = GetComponent<BlockManager>().FindBlock("game:monkey");
+        placeBlockValue = GetComponent<BlockManager>().FindBlock("game:stone_ball");
     }
 
     private void Update()

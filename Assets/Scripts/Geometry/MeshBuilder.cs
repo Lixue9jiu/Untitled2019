@@ -46,21 +46,35 @@ public class MeshBuilder : IMeshBuilder
         }
     }
 
-    public void Quad(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Rect tex, Color ca, Color cb, Color cc, Color cd, bool useRandomTex = false)
+    // when UseRandomVertices, the uv order will be randomized
+    // when InvertTriangles, the triangles will be made from a, b, c, and a, c, d; whereas they are a, b, d, and b, c, d otherwise
+    public void Quad(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Rect tex, Color ca, Color cb, Color cc, Color cd, MeshBuilderFlags flags)
     {
         int count = vertices.Count;
         vertices.Add(a);
         vertices.Add(b);
         vertices.Add(c);
         vertices.Add(d);
-        indices.Add(count);
-        indices.Add(count + 1);
-        indices.Add(count + 3);
-        indices.Add(count + 1);
-        indices.Add(count + 2);
-        indices.Add(count + 3);
+        if ((flags & MeshBuilderFlags.InvertTriangles) == MeshBuilderFlags.InvertTriangles)
+        {
+            indices.Add(count);
+            indices.Add(count + 1);
+            indices.Add(count + 2);
+            indices.Add(count);
+            indices.Add(count + 2);
+            indices.Add(count + 3);
+        }
+        else
+        {
+            indices.Add(count);
+            indices.Add(count + 1);
+            indices.Add(count + 3);
+            indices.Add(count + 1);
+            indices.Add(count + 2);
+            indices.Add(count + 3);
+        }
 
-        if (useRandomTex)
+        if ((flags & MeshBuilderFlags.UseRandomVertices) == MeshBuilderFlags.UseRandomVertices)
         {
             var uvRect = new Vector2[] { tex.min, new Vector2(tex.xMin, tex.yMax), tex.max, new Vector2(tex.xMax, tex.yMin) };
             int r = NextRand(a.GetHashCode()) & 3;

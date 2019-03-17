@@ -13,6 +13,7 @@ public static class YamlUtils
             {typeof(string), (n) => (n as YamlScalar).Value},
             {typeof(bool), (n) => bool.Parse((n as YamlScalar).Value)},
             {typeof(int), (n) => int.Parse((n as YamlScalar).Value)},
+            {typeof(float), (n) => float.Parse((n as YamlScalar).Value)},
             {typeof(ValuesDictionary), (n) => ValuesDictionary.FromYAML(n)}
         };
     }

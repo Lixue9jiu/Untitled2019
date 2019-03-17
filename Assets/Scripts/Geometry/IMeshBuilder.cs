@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System;
 
 public interface IMeshBuilder
 {
@@ -14,6 +13,14 @@ public interface IMeshBuilder
     /// <param name="cb">Cb.</param>
     /// <param name="cc">Cc.</param>
     /// <param name="cd">Cd.</param>
-    void Quad(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Rect tex, Color ca, Color cb, Color cc, Color cd, bool useRandomVert = false);
+    void Quad(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Rect tex, Color ca, Color cb, Color cc, Color cd, MeshBuilderFlags flags);
     void Mesh(Vector3Int pos, MeshData mesh, Color color);
+}
+
+[Flags]
+public enum MeshBuilderFlags : short
+{
+    None = 0,
+    UseRandomVertices = 1,
+    InvertTriangles = 2
 }

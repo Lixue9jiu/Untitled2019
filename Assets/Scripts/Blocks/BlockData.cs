@@ -7,6 +7,7 @@ public class BlockData
     public string name;
     public bool isOpaque;
     public bool isTransparent;
+    public float shadowStrength;
     public string renderer;
     public string bounds;
     public ValuesDictionary renderInfo;
