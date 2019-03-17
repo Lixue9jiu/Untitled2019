@@ -1,28 +1,35 @@
 ﻿using UnityEngine;
+using System.Collections;
 
-public class DefualtBlockRenderer : IBlockRenderer
+public class MeshBlockRenderer : IBlockRenderer
 {
-    private bool[] m_useRandomVert;
-    private Rect[] m_uvs;
+    private readonly MeshData m_mesh;
 
-    public DefualtBlockRenderer(Rect[] uvs, bool[] useRandomVert)
+    public MeshBlockRenderer(Rect uv, Mesh mesh)
     {
-        m_uvs = uvs;
-        m_useRandomVert = useRandomVert;
+        Vector2[] uvs = mesh.uv;
+        for (int i = 0; i < uvs.Length; i++)
+        {
+            uvs[i] = uvs[i] / 16f + uv.min;
+        }
+        mesh.uv = uvs;
+
+        m_mesh = new MeshData(mesh);
     }
 
     public void Render(BlockRenderContext context, Vector3Int pos, IMeshBuilder meshBuilder)
     {
-        int value = context.chunk[pos];
-        int[] neighbors = GetNeighborsFast(context, pos);
+        //int value = context.chunk[pos];
+        //int[] neighbors = GetNeighborsFast(context, pos);
 
-        for (int i = 0; i < 6; i++)
-        {
-            if (value != neighbors[i] && BlockRenderUtils.IsTransparent(context, neighbors[i]))
-            {
-                BlockRenderUtils.ShadedQuad(context, meshBuilder, pos, i, m_uvs[i], Color.white, Color.white, Color.white, Color.white, m_useRandomVert[i]);
-            }
-        }
+        //for (int i = 0; i < 6; i++)
+        //{
+        //    if (value != neighbors[i] && BlockRenderUtils.IsTransparent(context, neighbors[i]))
+        //    {
+        //        BlockRenderUtils.ShadedQuad(context, meshBuilder, pos, i, m_uv, Color.white, Color.white, Color.white, Color.white, false);
+        //    }
+        //}
+        meshBuilder.Mesh(pos, m_mesh, Color.white);
     }
 
     private static int[] GetNeighborsFast(BlockRenderContext context, Vector3Int pos)

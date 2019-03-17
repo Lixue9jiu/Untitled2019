@@ -4,11 +4,12 @@ using System.Collections.Generic;
 
 public class BlockRendererFactory : MonoBehaviour
 {
-    Dictionary<string, Func<string[], IBlockRenderer>> m_rendererLoaders = new Dictionary<string, Func<string[], IBlockRenderer>>();
+    Dictionary<string, Func<ValuesDictionary, IBlockRenderer>> m_rendererLoaders = new Dictionary<string, Func<ValuesDictionary, IBlockRenderer>>();
 
     public IBlockRenderer[] LoadBlockRenderers()
     {
         m_rendererLoaders["DefualtBlockRenderer"] = LoadDefualtRenderer;
+        m_rendererLoaders["MeshBlockRenderer"] = LoadMeshBlockRenderer;
 
         BlockData[] blocks = GetComponent<BlockManager>().Blocks;
         IBlockRenderer[] result = new IBlockRenderer[blocks.Length];
@@ -16,7 +17,7 @@ public class BlockRendererFactory : MonoBehaviour
         {
             if (string.IsNullOrEmpty(blocks[i].renderer))
                 continue;
-            result[i] = m_rendererLoaders[blocks[i].renderer](blocks[i].texture.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            result[i] = m_rendererLoaders[blocks[i].renderer](blocks[i].renderInfo);
         }
         return result;
     }
@@ -54,9 +55,10 @@ public class BlockRendererFactory : MonoBehaviour
         return null;
     }
 
-    private IBlockRenderer LoadDefualtRenderer(string[] args)
+    private IBlockRenderer LoadDefualtRenderer(ValuesDictionary dict)
     {
         var texManager = GetComponent<BlockTextureManager>();
+        var args = dict.GetValue<string>("texture").Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         if (args.Length == 1)
         {
             bool useRandom = false;
@@ -84,6 +86,21 @@ public class BlockRendererFactory : MonoBehaviour
             return new DefualtBlockRenderer(rects, useRandom);
         }
         Debug.LogError("wrong argument format for defualt block renderer");
+        Rect e = texManager.FindBlockTexture("Error");
+        return new DefualtBlockRenderer(new Rect[] { e, e, e, e, e, e }, new bool[] { false, false, false, false, false, false });
+    }
+
+    private IBlockRenderer LoadMeshBlockRenderer(ValuesDictionary dict)
+    {
+        var texManager = GetComponent<BlockTextureManager>();
+        var args = dict.GetValue<string>("texture").Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        if (args.Length == 1)
+        {
+            Rect uv = texManager.FindBlockTexture(args[0]);
+            Mesh m = GetComponent<ContentManager>().GetBundle("meshes").LoadAsset<Mesh>(dict.GetValue<string>("mesh"));
+            return new MeshBlockRenderer(uv, m);
+        }
+        Debug.LogError("wrong argument format for mesh block renderer");
         Rect e = texManager.FindBlockTexture("Error");
         return new DefualtBlockRenderer(new Rect[] { e, e, e, e, e, e }, new bool[] { false, false, false, false, false, false });
     }

@@ -10,26 +10,12 @@ public class MainThread : MonoBehaviour
     private void Start()
     {
         Test2();
-        Debug.Log(CullingManager.GetChunkFacePos(0, Vector3Int.one));
     }
-
-    Vector3Int[] chunks = new Vector3Int[0];
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             player.enabled = !player.enabled;
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (chunks != null)
-        {
-            foreach (Vector3Int v in chunks)
-            {
-                Gizmos.DrawWireCube(v * 16 + Vector3.one * 8, Vector3.one * 16);
-            }
-        }
     }
 
     private void Test0()

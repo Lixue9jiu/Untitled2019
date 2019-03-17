@@ -6,9 +6,10 @@ public class BlockData
 {
     public string name;
     public bool isOpaque;
+    public bool isTransparent;
     public string renderer;
     public string bounds;
-    public string texture;
+    public ValuesDictionary renderInfo;
 
     public static int GetContent(int value)
     {

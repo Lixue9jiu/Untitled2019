@@ -3,6 +3,8 @@ using System.Collections;
 
 public class MobileMinerController : MonoBehaviour
 {
+    int placeBlockValue;
+
     [SerializeField]
     MobileControlPanel controlPanel;
 
@@ -19,6 +21,11 @@ public class MobileMinerController : MonoBehaviour
     {
         m_terrain = GetComponent<TerrainManager>();
         m_raycaster = GetComponent<TerrainRaycaster>();
+    }
+
+    private void Start()
+    {
+        placeBlockValue = GetComponent<BlockManager>().FindBlock("game:monkey");
     }
 
     private void Update()
@@ -47,7 +54,7 @@ public class MobileMinerController : MonoBehaviour
         else if (controlPanel.IsTaping && lastResult.HasValue)
         {
             var pos = lastResult.Value.point + CellFace.FACES[lastResult.Value.face];
-            m_terrain.SetCellValue(pos.x, pos.y, pos.z, 1);
+            m_terrain.SetCellValue(pos.x, pos.y, pos.z, placeBlockValue);
         }
     }
 

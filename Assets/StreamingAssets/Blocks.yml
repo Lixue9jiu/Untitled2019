@@ -4,18 +4,38 @@
     renderer: DefualtBlockRenderer
     bounds: defualt
     isOpaque: true
+    isTransparent: false
+  meshBlock:
+    renderer: MeshBlockRenderer
+    bounds: defualt
+    isOpaque: true
+    isTransparent: true
 - !blockGroup
   name: Game
   blocks: 
     - !cubeBlock
       name: Bedrock
-      texture: Bedrock
+      renderInfo:
+        texture: Bedrock
     - !cubeBlock
       name: Stone
-      texture: Stone
+      renderInfo:
+        texture: Stone
     - !cubeBlock
       name: Dirt
-      texture: Dirt*
+      renderInfo:
+        texture: Dirt*
     - !cubeBlock
       name: Grass
-      texture: GrassSide GrassSide Grass* Dirt* GrassSide GrassSide
+      renderInfo:
+        texture: GrassSide GrassSide Grass* Dirt* GrassSide GrassSide
+    - !meshBlock
+      name: Stone Slab
+      renderInfo:
+        texture: Stone
+        mesh: slab
+    - !meshBlock
+      name: Stone Ball
+      renderInfo:
+        texture: Stone
+        mesh: ball

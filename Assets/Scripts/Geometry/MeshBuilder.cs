@@ -8,8 +8,6 @@ public class MeshBuilder : IMeshBuilder
     List<Vector2> uvs = new List<Vector2>();
     List<Color> colors = new List<Color>();
 
-    int randomSeed = 102836;
-
     public void Clear()
     {
         vertices.Clear();
@@ -29,15 +27,23 @@ public class MeshBuilder : IMeshBuilder
         };
     }
 
-    public void Mesh(Vector3Int pos, Mesh mesh)
+    public void Mesh(Vector3Int pos, MeshData mesh, Color color)
     {
-        foreach (Vector3 v in mesh.vertices)
+        int count = vertices.Count;
+        for (int i = 0; i < mesh.vertices.Length; i++)
         {
-            vertices.Add(pos + v);
+            vertices.Add(mesh.vertices[i] + pos);
         }
-        indices.AddRange(mesh.triangles);
+        for (int i = 0; i < mesh.triangles.Length; i++)
+        {
+            indices.Add(mesh.triangles[i] + count);
+        }
+
         uvs.AddRange(mesh.uv);
-        colors.AddRange(mesh.colors);
+        for (int i = 0; i < mesh.vertices.Length; i++)
+        {
+            colors.Add(color);
+        }
     }
 
     public void Quad(Vector3Int a, Vector3Int b, Vector3Int c, Vector3Int d, Rect tex, Color ca, Color cb, Color cc, Color cd, bool useRandomTex = false)
@@ -57,7 +63,7 @@ public class MeshBuilder : IMeshBuilder
         if (useRandomTex)
         {
             var uvRect = new Vector2[] { tex.min, new Vector2(tex.xMin, tex.yMax), tex.max, new Vector2(tex.xMax, tex.yMin) };
-            int r = NextRand() & 3;
+            int r = NextRand(a.GetHashCode()) & 3;
             uvs.Add(uvRect[r]);
             uvs.Add(uvRect[(r + 1) & 3]);
             uvs.Add(uvRect[(r + 2) & 3]);
@@ -77,9 +83,8 @@ public class MeshBuilder : IMeshBuilder
         colors.Add(cd);
     }
 
-    private int NextRand()
+    private int NextRand(int randomSeed)
     {
-        randomSeed = (randomSeed * 1103515245 + 12345) & 0xFFFFFFF;
-        return randomSeed;
+        return (randomSeed * 1103515245 + 12345) & 0xFFFFFFF;
     }
 }

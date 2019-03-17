@@ -29,6 +29,7 @@ public class BlockTextureManager : MonoBehaviour
 
         blocks.Unload(true);
     }
+
     private void PackTextures(Texture2D src, Texture2D[] texs, bool apply)
     {
         int mipmapCount = 6;

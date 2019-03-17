@@ -26,7 +26,7 @@ public class Chunk
 
     public int RenderIndex = -1;
 
-    public bool IsEmpty;
+    public bool IsEmpty = true;
 
     bool[] opaqueMask = new bool[36];
 
@@ -105,7 +105,7 @@ public class Chunk
             for (int y = 0; y < SIZE_Y; y++)
                 for (int z = 0; z < SIZE_Z; z++)
                 {
-                    if (!mask[x, y, z] && !manager.IsOpaque(this[x, y, z]))
+                    if (!mask[x, y, z] && manager.IsTransparent(this[x, y, z]))
                     {
                         bool[] faceFlag = new bool[6];
                         FloodFill(x, y, z, ref faceFlag, mask, manager);
@@ -143,7 +143,7 @@ public class Chunk
     {
         if (x < 0 || x == SIZE_X || y < 0 || y == SIZE_Y || z < 0 || z == SIZE_Z)
             return;
-        if (!mask[x, y, z] && !manager.IsOpaque(this[x, y, z]))
+        if (!mask[x, y, z] && manager.IsTransparent(this[x, y, z]))
         {
             if (x == 0)
                 cumulative[1] = true;

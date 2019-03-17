@@ -1,7 +1,10 @@
 ManifestFileVersion: 0
-CRC: 3157393619
+CRC: 3955203898
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
       Name: blocks
+      Dependencies: {}
+    Info_1:
+      Name: meshes
       Dependencies: {}

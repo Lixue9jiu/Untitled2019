@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class CullingManager : MonoBehaviour
 {
@@ -63,7 +64,9 @@ public class CullingManager : MonoBehaviour
                         if (IsFacingView(GetChunkFacePos(i, pos), CellFace.FACES[CellFace.OPPOSITE[i]], position) && (task.faceFrom == -1 || task.chunk.AreFacesConnected(task.faceFrom, i)))
                         {
                             if (FrustumCull(pos, frustum))
+                            {
                                 tasks.Push(new ChunkTaskInfo { chunk = chunk, faceFrom = CellFace.OPPOSITE[i], pos = pos });
+                            }
                         }
                     }
                 }
@@ -99,8 +102,8 @@ public class CullingManager : MonoBehaviour
 
     struct ChunkTaskInfo
     {
-        public int faceFrom;
         public Vector3Int pos;
+        public int faceFrom;
         public Chunk chunk;
     }
 }

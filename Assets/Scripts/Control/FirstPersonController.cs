@@ -17,6 +17,9 @@ public class FirstPersonController : MonoBehaviour
 
     private Vector3 velocity;
 
+    private bool waitingForNextJump;
+    private bool readyForNextJump;
+
     private void Awake()
     {
         chara = GetComponent<CharacterController>();
@@ -74,10 +77,29 @@ public class FirstPersonController : MonoBehaviour
         }
 
         velocity -= velocity.normalized * velocity.sqrMagnitude * 0.0003f;
-        if (touchingGround && CrossPlatfromInput.GetAxis("Jump") > 0)
+        if (CrossPlatfromInput.GetAxis("Jump") > 0)
         {
-            velocity.y = JumpHeight;
+            if (touchingGround)
+                velocity.y = JumpHeight;
+            if (readyForNextJump)
+            {
+                m_applyGravity = !m_applyGravity;
+                readyForNextJump = false;
+            }
+            waitingForNextJump = true;
+        }
+        else if (waitingForNextJump)
+        {
+            waitingForNextJump = false;
+            StartCoroutine(WaitForNextJump(0.5f));
         }
         //rig.MovePosition(rig.position + input * Time.fixedDeltaTime * Speed);
+    }
+
+    System.Collections.IEnumerator WaitForNextJump(float time)
+    {
+        readyForNextJump = true;
+        yield return new WaitForSeconds(time);
+        readyForNextJump = false;
     }
 }

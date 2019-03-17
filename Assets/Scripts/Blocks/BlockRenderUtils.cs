@@ -66,9 +66,9 @@ public static class BlockRenderUtils
         builder.Quad(pos + f[0], pos + f[1], pos + f[2], pos + f[3], tex, colors[0], colors[1], colors[2], colors[3], randomVert);
     }
 
-    public static bool IsOpaque(BlockRenderContext context, int value)
+    public static bool IsTransparent(BlockRenderContext context, int value)
     {
-        return context.blockManager.IsOpaque(BlockData.GetContent(value));
+        return context.blockManager.IsTransparent(BlockData.GetContent(value));
     }
 
     private static bool[] GetNeighbors(BlockRenderContext context, Vector3Int pos)
@@ -84,7 +84,7 @@ public static class BlockRenderUtils
         bool[] result = new bool[values.Length];
         for (int i = 0; i < values.Length; i++)
         {
-            result[i] = IsOpaque(context, values[i]);
+            result[i] = !IsTransparent(context, values[i]);
         }
         return result;
     }
@@ -104,7 +104,7 @@ public static class BlockRenderUtils
         bool[] result = new bool[values.Length];
         for (int i = 0; i < values.Length; i++)
         {
-            result[i] = IsOpaque(context, values[i]);
+            result[i] = !IsTransparent(context, values[i]);
         }
         return result;
     }

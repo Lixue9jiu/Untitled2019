@@ -5,14 +5,15 @@ using YamlSerializer;
 
 public static class YamlUtils
 {
-    private static Dictionary<Type, Func<string, object>> converters;
+    private static Dictionary<Type, Func<YamlNode, object>> converters;
 
     static YamlUtils()
     {
-        converters = new Dictionary<Type, Func<string, object>> {
-            {typeof(string), (s) => s},
-            {typeof(bool), (s) => bool.Parse(s)},
-            {typeof(int), (s) => int.Parse(s)}
+        converters = new Dictionary<Type, Func<YamlNode, object>> {
+            {typeof(string), (n) => (n as YamlScalar).Value},
+            {typeof(bool), (n) => bool.Parse((n as YamlScalar).Value)},
+            {typeof(int), (n) => int.Parse((n as YamlScalar).Value)},
+            {typeof(ValuesDictionary), (n) => ValuesDictionary.FromYAML(n)}
         };
     }
 
@@ -45,10 +46,10 @@ public static class YamlUtils
 
     private static object DeserializeNode(YamlNode node, Type type)
     {
+        if (converters.ContainsKey(type))
+            return converters[type].Invoke(node);
         if (node is YamlMapping)
             return DeserializeMap(node as YamlMapping, type);
-        if (node is YamlScalar)
-            return DeserializeScalar(node as YamlScalar, type);
         if (node is YamlSequence)
             return DeserializeSeq(node as YamlSequence, type);
         throw new Exception("cannot serialize node " + node);
@@ -78,11 +79,6 @@ public static class YamlUtils
             }
         }
         return obj;
-    }
-
-    private static object DeserializeScalar(YamlScalar scalar, Type type)
-    {
-        return converters[type](scalar.Value);
     }
 
     private static void LoadTemplates(YamlMapping templates, Dictionary<string, YamlMapping> target)

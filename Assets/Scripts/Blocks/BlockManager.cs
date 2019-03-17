@@ -14,6 +14,11 @@ public class BlockManager : MonoBehaviour
         return Blocks[index].isOpaque;
     }
 
+    public bool IsTransparent(int index)
+    {
+        return Blocks[index].isTransparent;
+    }
+
     public int FindBlock(string name)
     {
         if (!blockIds.ContainsKey(name))
@@ -30,7 +35,7 @@ public class BlockManager : MonoBehaviour
     private void AssignBlockIds(List<BlockDataGroup> groups)
     {
         List<BlockData> blocks = new List<BlockData>();
-        blocks.Add(new BlockData { name = "Air", isOpaque = false });
+        blocks.Add(new BlockData { name = "Air", isOpaque = false, isTransparent = true });
         blockIds["game:air"] = 0;
         int index = 1;
         foreach (BlockDataGroup group in groups)
