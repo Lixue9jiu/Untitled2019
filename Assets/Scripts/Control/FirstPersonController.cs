@@ -17,8 +17,7 @@ public class FirstPersonController : MonoBehaviour
 
     private Vector3 velocity;
 
-    private bool waitingForNextJump;
-    private bool readyForNextJump;
+    private DoubleTapListener doubleJumpListener = new DoubleTapListener(0.5f, "Jump");
 
     private void Awake()
     {
@@ -81,25 +80,13 @@ public class FirstPersonController : MonoBehaviour
         {
             if (touchingGround)
                 velocity.y = JumpHeight;
-            if (readyForNextJump)
-            {
-                m_applyGravity = !m_applyGravity;
-                readyForNextJump = false;
-            }
-            waitingForNextJump = true;
         }
-        else if (waitingForNextJump)
+
+        doubleJumpListener.Update();
+        if (doubleJumpListener.IsDoubleTapping)
         {
-            waitingForNextJump = false;
-            StartCoroutine(WaitForNextJump(0.5f));
+            m_applyGravity = !m_applyGravity;
         }
         //rig.MovePosition(rig.position + input * Time.fixedDeltaTime * Speed);
-    }
-
-    System.Collections.IEnumerator WaitForNextJump(float time)
-    {
-        readyForNextJump = true;
-        yield return new WaitForSeconds(time);
-        readyForNextJump = false;
     }
 }
