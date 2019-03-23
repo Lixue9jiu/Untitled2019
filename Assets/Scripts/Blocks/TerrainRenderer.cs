@@ -12,6 +12,8 @@ public class TerrainRenderer : MonoBehaviour
     IBlockRenderer[] m_renderers;
     BlockBounds?[] m_bounds;
 
+    public IBlockRenderer[] BlockRenderers => m_renderers;
+
     List<ChunkInstance> instances = new List<ChunkInstance>();
     Queue<int> freeIndices = new Queue<int>();
 
@@ -274,7 +276,7 @@ public class TerrainRenderer : MonoBehaviour
                         blockManager = m_blockManager,
                         terrainManager = m_terrainManager
                     };
-                    m_renderers[BlockData.GetContent(chunk[x, y, z])]?.Render(context, new Vector3Int(x, y, z), builder);
+                    m_renderers[BlockData.GetContent(chunk[x, y, z])]?.DrawTerrain(context, new Vector3Int(x, y, z), builder);
                 }
             }
         }

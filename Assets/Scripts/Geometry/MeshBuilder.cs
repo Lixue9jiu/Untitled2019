@@ -42,7 +42,7 @@ public class MeshBuilder : IMeshBuilder
         uvs.AddRange(mesh.uv);
         for (int i = 0; i < mesh.vertices.Length; i++)
         {
-            colors.Add(color);
+            colors.Add(mesh.colors[i] * color);
         }
     }
 

@@ -2,5 +2,6 @@
 
 public interface IBlockRenderer
 {
-    void Render(BlockRenderContext context, Vector3Int pos, IMeshBuilder meshBuilder);
+    void DrawTerrain(BlockRenderContext context, Vector3Int pos, IMeshBuilder meshBuilder);
+    void DrawStandalone(int value, Matrix4x4 transform, Material sharedMaterial, BlockTextureManager textureManager, Camera camera);
 }

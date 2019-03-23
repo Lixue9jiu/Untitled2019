@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 785335478
+CRC: 3329232527
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1f3d9d61ca3896e60aa417027fc1a815
+    Hash: 59396b76c4fe1e4c4f7ba18f79b91358
   TypeTreeHash:
     serializedVersion: 2
     Hash: 798811b7255c82b34a9f8780c2ce846a
@@ -25,5 +25,6 @@ ClassTypes:
   Script: {instanceID: 0}
 Assets:
 - Assets/AssetBundle/Meshes/ball.obj
+- Assets/AssetBundle/Meshes/monkey.obj
 - Assets/AssetBundle/Meshes/slab.obj
 Dependencies: []

@@ -42,3 +42,9 @@
       renderInfo:
         texture: Stone
         mesh: ball
+    - !meshBlock
+      name: Monkey Head
+      shadowStrength: 0.7
+      renderInfo:
+        texture: Stone
+        mesh: monkey

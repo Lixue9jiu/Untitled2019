@@ -2,16 +2,21 @@
 
 public class DefualtBlockRenderer : IBlockRenderer
 {
-    private bool[] m_useRandomVert;
-    private Rect[] m_uvs;
+    private readonly bool[] m_useRandomVert;
+    private readonly Rect[] m_uvs;
+
+    private readonly Mesh standaloneMesh;
 
     public DefualtBlockRenderer(Rect[] uvs, bool[] useRandomVert)
     {
         m_uvs = uvs;
         m_useRandomVert = useRandomVert;
+
+        standaloneMesh = new Mesh();
+
     }
 
-    public void Render(BlockRenderContext context, Vector3Int pos, IMeshBuilder meshBuilder)
+    public void DrawTerrain(BlockRenderContext context, Vector3Int pos, IMeshBuilder meshBuilder)
     {
         int value = context.chunk[pos];
         int[] neighbors = GetNeighborsFast(context, pos);
@@ -35,5 +40,10 @@ public class DefualtBlockRenderer : IBlockRenderer
             pos.z == Chunk.SIZE_Z_MINUS_ONE ? context.neighbors[4][pos.x, pos.y, 0] : context.chunk[pos.x, pos.y, pos.z + 1],
             pos.z == 0 ? context.neighbors[5][pos.x, pos.y, Chunk.SIZE_Z_MINUS_ONE] : context.chunk[pos.x, pos.y, pos.z - 1]
         };
+    }
+
+    public void DrawStandalone(int value, Matrix4x4 transform, Material sharedMaterial, BlockTextureManager textureManager, Camera camera)
+    {
+        throw new System.NotImplementedException();
     }
 }

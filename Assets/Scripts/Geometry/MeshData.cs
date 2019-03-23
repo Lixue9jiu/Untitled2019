@@ -23,12 +23,19 @@ public class MeshData
     {
     }
 
-    public MeshData(Mesh m)
+    public MeshData(Mesh m, bool recalculateShadow = false)
     {
         vertices = m.vertices;
         triangles = m.triangles;
         uv = m.uv;
-        colors = m.colors;
+        if (recalculateShadow)
+        {
+            RecalculateShadow(m.normals, BlockRenderUtils.mainLight);
+        }
+        else
+        {
+            colors = m.colors;
+        }
     }
 
     public void ToMesh(Mesh mesh)
@@ -145,6 +152,16 @@ public class MeshData
             int tmp = tri[i];
             tri[i] = tri[i + 1];
             tri[i + 1] = tmp;
+        }
+    }
+
+    private void RecalculateShadow(Vector3[] normals, Vector3 light)
+    {
+        int count = vertices.Length;
+        colors = new Color[count];
+        for (int i = 0; i < count; i++)
+        {
+            colors[i] = BlockRenderUtils.CalculateShadow(light, normals[i]);
         }
     }
 }
