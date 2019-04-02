@@ -17,6 +17,7 @@ public class MeshBlockRenderer : IBlockRenderer
         mesh.uv = uvs;
 
         m_mesh = new MeshData(mesh, true);
+        standaloneMesh = m_mesh.ToMesh();
     }
 
     public void DrawTerrain(BlockRenderContext context, Vector3Int pos, IMeshBuilder meshBuilder)
@@ -24,8 +25,9 @@ public class MeshBlockRenderer : IBlockRenderer
         meshBuilder.Mesh(pos, m_mesh, Color.white);
     }
 
-    public void DrawStandalone(int value, Matrix4x4 transform, Material sharedMaterial, BlockTextureManager textureManager, Camera camera)
+    public void DrawStandalone(int value, Matrix4x4 transform, Material sharedMaterial, BlockTextureManager textureManager, int layer, Camera camera)
     {
-        Graphics.DrawMesh(standaloneMesh, transform, sharedMaterial, 0, camera);
+        sharedMaterial.mainTexture = textureManager.MainTexture;
+        Graphics.DrawMesh(standaloneMesh, transform, sharedMaterial, layer, camera);
     }
 }

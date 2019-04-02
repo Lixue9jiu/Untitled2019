@@ -12,8 +12,14 @@ public class DefualtBlockRenderer : IBlockRenderer
         m_uvs = uvs;
         m_useRandomVert = useRandomVert;
 
-        standaloneMesh = new Mesh();
-
+        MeshBuilder builder = new MeshBuilder();
+        for (int i = 0; i < 6; i++)
+        {
+            var faces = BlockRenderUtils.faces[i];
+            var color = BlockRenderUtils.CalculateShadow(BlockRenderUtils.mainLight, BlockRenderUtils.offsets[i]);
+            builder.Quad(faces[0], faces[1], faces[2], faces[3], uvs[i], color, color, color, color, MeshBuilderFlags.None);
+        }
+        standaloneMesh = builder.ToMesh();
     }
 
     public void DrawTerrain(BlockRenderContext context, Vector3Int pos, IMeshBuilder meshBuilder)
@@ -42,8 +48,9 @@ public class DefualtBlockRenderer : IBlockRenderer
         };
     }
 
-    public void DrawStandalone(int value, Matrix4x4 transform, Material sharedMaterial, BlockTextureManager textureManager, Camera camera)
+    public void DrawStandalone(int value, Matrix4x4 transform, Material sharedMaterial, BlockTextureManager textureManager, int layer, Camera camera)
     {
-        throw new System.NotImplementedException();
+        sharedMaterial.mainTexture = textureManager.MainTexture;
+        Graphics.DrawMesh(standaloneMesh, transform, sharedMaterial, layer, camera);
     }
 }

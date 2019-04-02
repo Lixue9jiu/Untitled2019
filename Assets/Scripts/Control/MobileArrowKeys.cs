@@ -18,36 +18,29 @@ public class MobileArrowKeys : MonoBehaviour, IPointerDownHandler, IPointerUpHan
 
     Vector2? pointerPos;
 
-    private void Start()
-    {
-        UpdateCenter();
-    }
-
     private void UpdateCenter()
     {
-        center = RectTransformUtility.PixelAdjustRect(GetComponent<RectTransform>(), GetComponentInParent<Canvas>()).center;
-        var scaler = GetComponentInParent<CanvasScaler>();
-
-        float referenceWidth = scaler.referenceResolution.x;
-
-        float referenceHeight = scaler.referenceResolution.y;
-
-        float match = scaler.matchWidthOrHeight;
-
-        float offect = (Screen.width / referenceWidth) * (1 - match) + (Screen.height / referenceHeight) * match;
-
-        center *= offect;
+        Camera c = GameObject.FindWithTag("StandaloneBlockRenderer").GetComponent<Camera>();
+        center = c.WorldToScreenPoint(RectTransformUtility.PixelAdjustRect(GetComponent<RectTransform>(), GetComponentInParent<Canvas>()).center);
+        center *= transform.lossyScale.x;
     }
 
     private void Update()
     {
+        if (transform.hasChanged)
+        {
+            UpdateCenter();
+            transform.hasChanged = false;
+        }
+
         leftButton.Pressed = false;
         rightButton.Pressed = false;
         forwardButton.Pressed = false;
         backButton.Pressed = false;
 
-        CrossPlatfromInput.SetAxis("Vertical", 0);
-        CrossPlatfromInput.SetAxis("Horizontal", 0);
+        var input = CrossPlatfromInput.instance;
+        input.SetAxis("Vertical", 0);
+        input.SetAxis("Horizontal", 0);
 
         if (pointerPos.HasValue)
         {
@@ -57,12 +50,12 @@ public class MobileArrowKeys : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 if (p.x < 0)
                 {
                     leftButton.Pressed = true;
-                    CrossPlatfromInput.SetAxis("Horizontal", -1);
+                    input.SetAxis("Horizontal", -1);
                 }
                 else
                 {
                     rightButton.Pressed = true;
-                    CrossPlatfromInput.SetAxis("Horizontal", 1);
+                    input.SetAxis("Horizontal", 1);
                 }
             }
             else
@@ -70,12 +63,12 @@ public class MobileArrowKeys : MonoBehaviour, IPointerDownHandler, IPointerUpHan
                 if (p.y < 0)
                 {
                     backButton.Pressed = true;
-                    CrossPlatfromInput.SetAxis("Vertical", -1);
+                    input.SetAxis("Vertical", -1);
                 }
                 else
                 {
                     forwardButton.Pressed = true;
-                    CrossPlatfromInput.SetAxis("Vertical", 1);
+                    input.SetAxis("Vertical", 1);
                 }
             }
         }

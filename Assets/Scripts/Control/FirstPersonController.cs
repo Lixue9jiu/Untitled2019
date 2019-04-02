@@ -1,27 +1,30 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CharacterBody))]
 public class FirstPersonController : MonoBehaviour
 {
     public float MouseSensitivity = 1f;
     public float Speed = 1f;
     public float JumpHeight = 2f;
 
-    [SerializeField]
+    private CharacterBody body;
+
     Transform cameraTransform;
-    [SerializeField]
-    private LayerMask Ground;
-    private CharacterController chara;
     private float _pitch;
-    private bool m_applyGravity = true;
 
-    private Vector3 velocity;
+    private DoubleTapListener doubleJumpListener = new DoubleTapListener(0.4f, "Jump");
 
-    private DoubleTapListener doubleJumpListener = new DoubleTapListener(0.5f, "Jump");
+    private CrossPlatfromInput m_input;
 
     private void Awake()
     {
-        chara = GetComponent<CharacterController>();
+        body = GetComponent<CharacterBody>();
+    }
+
+    private void Start()
+    {
+        m_input = CrossPlatfromInput.instance;
+        cameraTransform = GetComponentInChildren<Camera>().transform;
     }
 
 #if UNITY_EDITOR || !UNITY_ANDROID
@@ -41,52 +44,40 @@ public class FirstPersonController : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.F))
-            m_applyGravity = !m_applyGravity;
-
-        float pitch = _pitch - CrossPlatfromInput.GetAxis("Mouse Y") * MouseSensitivity;
+            body.ApplyGravity = !body.ApplyGravity;
+        
+        float pitch = _pitch - m_input.GetAxis("Mouse Y") * MouseSensitivity;
         pitch = Mathf.Clamp(pitch, -85, 85);
         cameraTransform.Rotate(new Vector3(pitch - _pitch, 0, 0), Space.Self);
         _pitch = pitch;
 
-        transform.Rotate(new Vector3(0, CrossPlatfromInput.GetAxis("Mouse X") * MouseSensitivity, 0), Space.World);
-    }
-
-    private void FixedUpdate()
-    {
-        Vector3 input = (transform.forward * CrossPlatfromInput.GetAxis("Vertical") + transform.right * CrossPlatfromInput.GetAxis("Horizontal")) * Speed * Time.fixedDeltaTime;
-
-        if (!m_applyGravity)
-        {
-            velocity.y = 0;
-            input.y = Input.GetAxis("Fly") * Speed * Time.fixedDeltaTime;
-            input *= 4;
-        }
-
-        var flags = chara.Move(velocity * Time.fixedDeltaTime + input);
-        bool touchingGround = (flags & CollisionFlags.Below) == CollisionFlags.Below;
-        if ((flags & CollisionFlags.Above) == CollisionFlags.Above || (flags & CollisionFlags.Below) == CollisionFlags.Below)
-            velocity.y = 0;
-
-        if (m_applyGravity)
-        {
-            if (!touchingGround)
-                velocity += Physics.gravity * Time.fixedDeltaTime;
-            else
-                velocity.y = -0.1f;
-        }
-
-        velocity -= velocity.normalized * velocity.sqrMagnitude * 0.0003f;
-        if (CrossPlatfromInput.GetAxis("Jump") > 0)
-        {
-            if (touchingGround)
-                velocity.y = JumpHeight;
-        }
+        transform.Rotate(new Vector3(0, m_input.GetAxis("Mouse X") * MouseSensitivity, 0), Space.World);
 
         doubleJumpListener.Update();
         if (doubleJumpListener.IsDoubleTapping)
         {
-            m_applyGravity = !m_applyGravity;
+            body.ApplyGravity = !body.ApplyGravity;
+            doubleJumpListener.IsDoubleTapping = false;
         }
-        //rig.MovePosition(rig.position + input * Time.fixedDeltaTime * Speed);
+    }
+
+    private void FixedUpdate()
+    {
+        Vector3 input = (transform.forward * m_input.GetAxis("Vertical") + transform.right * m_input.GetAxis("Horizontal")) * Speed * Time.fixedDeltaTime;
+
+        if (!body.ApplyGravity)
+        {
+            input.y = m_input.GetAxis("Fly") * Speed * Time.fixedDeltaTime;
+            input *= 2f;
+        }
+
+        if (m_input.GetAxis("Jump") > 0)
+        {
+            if (body.TouchingGround)
+            {
+                body.JumpOrder = 1;
+            }
+        }
+        body.MoveOrder = input;
     }
 }

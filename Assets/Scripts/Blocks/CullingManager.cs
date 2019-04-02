@@ -54,19 +54,20 @@ public class CullingManager : MonoBehaviour
             if (task.chunk.RenderIndex != -1)
             {
                 output.Add(task.chunk.RenderIndex);
-                for (int i = 0; i < 6; i++)
+            }
+            visitedPos.Add(task.pos);
+
+            for (int i = 0; i < 6; i++)
+            {
+                var pos = task.pos + CellFace.FACES[i];
+                var chunk = terrain.GetChunk(pos);
+                if ((pos - origin).sqrMagnitude < TerrainRenderer.ViewDistanceSqr && !visitedPos.Contains(pos))
                 {
-                    var pos = task.pos + CellFace.FACES[i];
-                    var chunk = terrain.GetChunk(pos);
-                    if (!output.Contains(chunk.RenderIndex))
+                    if (IsFacingView(GetChunkFacePos(i, pos), CellFace.FACES[CellFace.OPPOSITE[i]], position) && (task.faceFrom == -1 || task.chunk.AreFacesConnected(task.faceFrom, i)))
                     {
-                        visitedPos.Add(pos);
-                        if (IsFacingView(GetChunkFacePos(i, pos), CellFace.FACES[CellFace.OPPOSITE[i]], position) && (task.faceFrom == -1 || task.chunk.AreFacesConnected(task.faceFrom, i)))
+                        if (FrustumCull(pos, frustum))
                         {
-                            if (FrustumCull(pos, frustum))
-                            {
-                                tasks.Push(new ChunkTaskInfo { chunk = chunk, faceFrom = CellFace.OPPOSITE[i], pos = pos });
-                            }
+                            tasks.Push(new ChunkTaskInfo { chunk = chunk, faceFrom = CellFace.OPPOSITE[i], pos = pos });
                         }
                     }
                 }

@@ -9,19 +9,22 @@ public class DoubleTapListener
     float coolDown;
     int tapCount;
 
-    bool lastInput;
-
     public bool IsDoubleTapping
     {
         get
         {
-            if (coolDown > 0 && tapCount > 1)
+            if (tapCount > 1 && coolDown > 0)
             {
-                coolDown = m_coolDown;
-                tapCount = 0;
                 return true;
             }
             return false;
+        }
+        set
+        {
+            if (!value)
+            {
+                tapCount = 0;
+            }
         }
     }
 
@@ -33,18 +36,19 @@ public class DoubleTapListener
 
     public void Update()
     {
-        coolDown -= Time.deltaTime;
-        if (coolDown < 0)
-        {
-            coolDown = m_coolDown;
-            tapCount = 0;
-        }
-
-        bool currentInput = CrossPlatfromInput.GetAxis(m_monitorInputName) > 0;
-        if (!lastInput && currentInput)
+        if (CrossPlatfromInput.instance.GetButtonDown(m_monitorInputName))
         {
             tapCount++;
+            if (tapCount == 1)
+            {
+                coolDown = m_coolDown;
+            }
         }
-        lastInput = currentInput;
+
+        if (coolDown < 0)
+        {
+            tapCount = 0;
+        }
+        coolDown -= Time.deltaTime;
     }
 }

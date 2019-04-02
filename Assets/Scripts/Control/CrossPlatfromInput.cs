@@ -2,18 +2,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class CrossPlatfromInput
+public class CrossPlatfromInput : MonoBehaviour
 {
-    static Dictionary<string, float> axis = new Dictionary<string, float>();
+    public static CrossPlatfromInput instance;
 
-    public static void SetAxis(string name, float value)
+    Dictionary<string, float> axis = new Dictionary<string, float>();
+    Dictionary<string, bool> buttonDown = new Dictionary<string, bool>();
+    Dictionary<string, bool> buttonUp = new Dictionary<string, bool>();
+
+    private void Awake()
     {
-#if UNITY_ANDROID
-        axis[name] = value;
-#endif
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(this);
     }
 
-    public static float GetAxis(string name)
+    private void LateUpdate()
+    {
+        buttonDown.Clear();
+        buttonUp.Clear();
+    }
+
+    public void SetAxis(string name, float value)
+    {
+        if (axis.ContainsKey(name))
+            if (axis[name] < value)
+            {
+                buttonDown[name] = true;
+            }
+            else if (axis[name] > value)
+            {
+                buttonUp[name] = true;
+            }
+        axis[name] = value;
+    }
+
+    public float GetAxis(string name)
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
         if (!axis.ContainsKey(name))
@@ -21,6 +46,28 @@ public static class CrossPlatfromInput
         return axis[name];
 #else
         return Input.GetAxis(name);
+#endif
+    }
+
+    public bool GetButtonDown(string name)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if (!buttonDown.ContainsKey(name))
+            buttonDown[name] = false;
+        return buttonDown[name];
+#else
+        return Input.GetButtonDown(name);
+#endif
+    }
+
+    public bool GetButtonUp(string name)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if (!buttonUp.ContainsKey(name))
+            buttonUp[name] = false;
+        return buttonUp[name];
+#else
+        return Input.GetButtonUp(name);
 #endif
     }
 }

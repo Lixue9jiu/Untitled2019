@@ -1,19 +1,40 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(RawImage))]
-public class InventoryItemFrame : MonoBehaviour
+public class InventoryItemFrame : MonoBehaviour, IPointerClickHandler
 {
-    private static Camera sharedCamera;
+    private static Matrix4x4 m_view = Matrix4x4.Rotate(Quaternion.AngleAxis(135, Vector3.up) * Quaternion.FromToRotation(new Vector3(1, 1, 1), new Vector3(1, 0, 1)));
+
+    private Camera sharedCamera;
+    [SerializeField]
+    private Material sharedMaterial;
 
     TerrainRenderer terrainRenderer;
+    BlockTextureManager blockTextureManager;
 
     private RawImage m_image;
 
     [SerializeField]
     private RawImage m_tint;
 
+    private int iconLayer;
+
+    public int blockValue = 7;
+
     private bool m_selected;
+
+    private Matrix4x4 scale;
+    private Matrix4x4 position;
+
+    public ItemFrameClickEvent onClick = new ItemFrameClickEvent();
+
+    [SerializeField]
+    public class ItemFrameClickEvent : UnityEvent<InventoryItemFrame>
+    {
+    }
 
     public bool Selected
     {
@@ -35,30 +56,40 @@ public class InventoryItemFrame : MonoBehaviour
 
     private void Start()
     {
-        if (terrainRenderer == null)
-            terrainRenderer = FindObjectOfType<TerrainRenderer>();
+        iconLayer = LayerMask.NameToLayer("Icons");
 
-        if (sharedCamera == null)
+        sharedCamera = GameObject.FindWithTag("StandaloneBlockRenderer").GetComponent<Camera>();
+
+        terrainRenderer = FindObjectOfType<TerrainRenderer>();
+        blockTextureManager = FindObjectOfType<BlockTextureManager>();
+    }
+
+    private void UpdateTransform()
+    {
+        var trans = GetComponent<RectTransform>();
+        float s = transform.lossyScale.y * trans.sizeDelta.y / 2;
+        scale = Matrix4x4.Scale(new Vector3(s, s, s));
+
+        var pos = transform.position;
+        position = Matrix4x4.Translate(new Vector3(pos.x, pos.y, 0));
+    }
+
+    private void Update()
+    {
+        if (blockValue != 0)
         {
-            sharedCamera = new Camera();
-            sharedCamera.orthographic = true;
-            sharedCamera.backgroundColor = new Color(1, 1, 1, 0);
+            IBlockRenderer r = terrainRenderer.BlockRenderers[BlockData.GetContent(blockValue)];
+            r.DrawStandalone(blockValue, position * scale * m_view, sharedMaterial, blockTextureManager, iconLayer, sharedCamera);
+        }
+        if (transform.hasChanged)
+        {
+            UpdateTransform();
+            transform.hasChanged = false;
         }
     }
 
-    private void DrawBlock(int value)
+    public void OnPointerClick(PointerEventData eventData)
     {
-        MeshBuilder builder = new MeshBuilder();
-        IBlockRenderer r = terrainRenderer.BlockRenderers[BlockData.GetContent(value)];
-        //r.DrawStandalone(value, builder);
-    }
-
-    private void OnDestroy()
-    {
-        if (sharedCamera != null)
-        {
-            Destroy(sharedCamera);
-            sharedCamera = null;
-        }
+        onClick.Invoke(this);
     }
 }

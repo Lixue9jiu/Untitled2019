@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 public class TerrainRenderer : MonoBehaviour
 {
+    public const int ViewDistanceSqr = 64;
+
     TerrainManager m_terrainManager;
     BlockManager m_blockManager;
 
@@ -13,6 +15,7 @@ public class TerrainRenderer : MonoBehaviour
     BlockBounds?[] m_bounds;
 
     public IBlockRenderer[] BlockRenderers => m_renderers;
+    public BlockBounds?[] BlockBounds => m_bounds;
 
     List<ChunkInstance> instances = new List<ChunkInstance>();
     Queue<int> freeIndices = new Queue<int>();
@@ -20,13 +23,15 @@ public class TerrainRenderer : MonoBehaviour
     HashSet<int> visibleChunks = new HashSet<int>();
 
     [SerializeField]
-    Material opaueMaterial;
+    Material opaqueMaterial;
 
     [SerializeField]
     GameObject terrian;
 
     [SerializeField]
     GameObject chunkPrefab;
+
+    public Material MainMaterial => opaqueMaterial;
 
     class ChunkInstance
     {
@@ -45,7 +50,7 @@ public class TerrainRenderer : MonoBehaviour
     {
         m_renderers = GetComponent<BlockRendererFactory>().LoadBlockRenderers();
         m_bounds = GetComponent<BlockRendererFactory>().LoadBlockBounds();
-        opaueMaterial.mainTexture = GetComponent<BlockTextureManager>().MainTexture;
+        opaqueMaterial.mainTexture = GetComponent<BlockTextureManager>().MainTexture;
     }
 
     private void Update()
@@ -56,7 +61,7 @@ public class TerrainRenderer : MonoBehaviour
         GetComponent<LabelRenderer>().AddLabel($"chunks rendered: {visibleChunks.Count}");
         foreach (int i in visibleChunks)
         {
-            Graphics.DrawMesh(instances[i].mesh, instances[i].matrix, opaueMaterial, 0);
+            Graphics.DrawMesh(instances[i].mesh, instances[i].matrix, opaqueMaterial, 0);
         }
     }
 

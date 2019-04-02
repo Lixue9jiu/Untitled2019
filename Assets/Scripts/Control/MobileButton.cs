@@ -20,7 +20,7 @@ public class MobileButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     private void Update()
     {
         basePanel.Pressed = isPressed;
-        CrossPlatfromInput.SetAxis(inputName, isPressed ? 1 : 0);
+        CrossPlatfromInput.instance.SetAxis(inputName, isPressed ? 1 : 0);
     }
 
     public void OnPointerDown(PointerEventData eventData)

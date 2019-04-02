@@ -18,6 +18,7 @@ public class MobileControlPanel : MonoBehaviour, IPointerUpHandler, IPointerDown
     float cumulativeTime;
 
     bool isHolding;
+    CrossPlatfromInput m_input;
 
     public bool IsLongHolding => isHolding && cumulativeTime > LONG_HOLD_TIME;
 
@@ -40,17 +41,19 @@ public class MobileControlPanel : MonoBehaviour, IPointerUpHandler, IPointerDown
     {
         screenWidth = Screen.width;
         screenHeight = Screen.height;
+
+        m_input = CrossPlatfromInput.instance;
     }
 
     private void Update()
     {
-        CrossPlatfromInput.SetAxis("Mouse X", 0);
-        CrossPlatfromInput.SetAxis("Mouse Y", 0);
+        m_input.SetAxis("Mouse X", 0);
+        m_input.SetAxis("Mouse Y", 0);
 
         if (isTouching)
         {
-            CrossPlatfromInput.SetAxis("Mouse X", pointerDelta.x / MOUSE_OFFSET_DIVIDER);
-            CrossPlatfromInput.SetAxis("Mouse Y", pointerDelta.y / MOUSE_OFFSET_DIVIDER);
+            m_input.SetAxis("Mouse X", pointerDelta.x / MOUSE_OFFSET_DIVIDER);
+            m_input.SetAxis("Mouse Y", pointerDelta.y / MOUSE_OFFSET_DIVIDER);
 
             cumulativeTime += Time.deltaTime;
             if (cumulativeTime < LONG_HOLD_TIME)

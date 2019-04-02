@@ -38,6 +38,13 @@ public class MeshData
         }
     }
 
+    public Mesh ToMesh()
+    {
+        Mesh result = new Mesh();
+        ToMesh(result);
+        return result;
+    }
+
     public void ToMesh(Mesh mesh)
     {
         //if (vertices.Length > 65534)

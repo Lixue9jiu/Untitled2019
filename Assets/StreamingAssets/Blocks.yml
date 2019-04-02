@@ -33,6 +33,7 @@
     - !meshBlock
       name: Stone Slab
       shadowStrength: 0.5
+      bounds: 0.5 0.25 0.5 1 0.5 1
       renderInfo:
         texture: Stone
         mesh: slab

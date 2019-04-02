@@ -10,7 +10,7 @@ public static class BlockRenderUtils
     /// <summary>
     /// The vertices defining six faces in the order of: x+, x-, y+, y-, z+, z-
     /// </summary>
-    private static readonly Vector3Int[][] faces =
+    public static readonly Vector3Int[][] faces =
     {
         new Vector3Int[] { new Vector3Int(1, 0, 0), new Vector3Int(1, 1, 0), new Vector3Int(1, 1, 1), new Vector3Int(1, 0, 1) },
         new Vector3Int[] { new Vector3Int(0, 0, 1), new Vector3Int(0, 1, 1), new Vector3Int(0, 1, 0), new Vector3Int(0, 0, 0) },
@@ -20,7 +20,7 @@ public static class BlockRenderUtils
         new Vector3Int[] { new Vector3Int(0, 0, 0), new Vector3Int(0, 1, 0), new Vector3Int(1, 1, 0), new Vector3Int(1, 0, 0) }
     };
 
-    private static readonly Vector3Int[] offsets =
+    public static readonly Vector3Int[] offsets =
     {
         new Vector3Int(1, 0, 0),
         new Vector3Int(-1, 0, 0),
@@ -30,7 +30,7 @@ public static class BlockRenderUtils
         new Vector3Int(0, 0, -1)
     };
 
-    public static Vector3 mainLight = new Vector3(-1.2f, -2, -1).normalized;
+    public static Vector3 mainLight = new Vector3(-1.2f, -2, 0.5f).normalized;
 
     public static void Quad(IMeshBuilder builder, int face, Rect tex, Color ca, Color cb, Color cc, Color cd)
     {

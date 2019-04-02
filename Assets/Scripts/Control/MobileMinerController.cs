@@ -3,7 +3,7 @@ using System.Collections;
 
 public class MobileMinerController : MonoBehaviour
 {
-    int placeBlockValue;
+    public int placeBlockValue;
 
     [SerializeField]
     MobileControlPanel controlPanel;
@@ -54,7 +54,8 @@ public class MobileMinerController : MonoBehaviour
         else if (controlPanel.IsTaping && lastResult.HasValue)
         {
             var pos = lastResult.Value.point + CellFace.FACES[lastResult.Value.face];
-            m_terrain.SetCellValue(pos.x, pos.y, pos.z, placeBlockValue);
+            if (!Physics.CheckBox(pos + new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.4f, 0.4f, 0.4f)))
+                m_terrain.SetCellValue(pos.x, pos.y, pos.z, placeBlockValue);
         }
     }
 

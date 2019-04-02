@@ -38,7 +38,9 @@ public class BlockRendererFactory : MonoBehaviour
     private BlockBounds? LoadBounds(string str)
     {
         if (str == "defualt")
-            return new BlockBounds { isDefualt = true };
+            return new BlockBounds { isDefualt = true, bounds = new Bounds(new Vector3(0.5f, 0.5f, 0.5f), new Vector3(1, 1, 1)) };
+        if (str == null || str == "null")
+            return null;
         var strs = str.Split(' ');
         if (strs.Length == 6)
         {

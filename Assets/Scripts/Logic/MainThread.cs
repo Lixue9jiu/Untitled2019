@@ -7,6 +7,9 @@ public class MainThread : MonoBehaviour
     [SerializeField]
     FirstPersonController player;
 
+    [SerializeField]
+    GameObject inventoryPrefab;
+
     private void Start()
     {
         Test2();
@@ -14,8 +17,12 @@ public class MainThread : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && GetComponent<WindowManager>().Escape())
             player.enabled = !player.enabled;
+        if (CrossPlatfromInput.instance.GetButtonDown("Inventory") && !GetComponent<WindowManager>().IsShowing<CreativeItemMenu>())
+        {
+            GetComponent<WindowManager>().AddWindow(inventoryPrefab);
+        }
     }
 
     private void Test0()
@@ -38,9 +45,9 @@ public class MainThread : MonoBehaviour
                         chunk[x, y, z] = grass;
                 }
         //for (int x = 6; x < 10; x++)
-            //for (int z = 6; z < 10; z++)
-                //for (int y = 10; y < 14; y++)
-                    //chunk[x, y, z] = stone;
+        //for (int z = 6; z < 10; z++)
+        //for (int y = 10; y < 14; y++)
+        //chunk[x, y, z] = stone;
 
         GetComponent<TerrainManager>().SetChunkStack(0, 0, chunk);
         GetComponent<TerrainRenderer>().AddChunkStackToRender(0, 0);
@@ -123,14 +130,49 @@ public class MainThread : MonoBehaviour
                 }
     }
 
+    private void GenerateTerrain3d(int ox, int oz, ChunkStack chunk)
+    {
+        float cutoff = 0.4f;
+        var block = GetComponent<BlockManager>();
+        var stone = block.FindBlock("game:stone");
+        for (int x = 0; x < Chunk.SIZE_X; x ++)
+            for (int y = 0; y < Chunk.SIZE_Y * 4; y++)
+                for (int z = 0; z < Chunk.SIZE_Z; z++)
+                {
+                    float sx = ox + x;
+                    float sy = y;
+                    float sz = oz + z;
+
+                    float value = (PerlinNoise(sx / 64f, sy / 64f, sz / 64f) +
+                        PerlinNoise(sx / 32f, sy / 32f, sz / 64f) * 0.5f +
+                        PerlinNoise(sx / 16f, sy / 16f, sz / 64f) * 0.25f) / 1.75f;
+
+                    if (value > cutoff)
+                        chunk[x, y, z] = stone;
+                }
+    }
+
+    private float PerlinNoise(float sx, float sy, float sz)
+    {
+        float AB = Mathf.PerlinNoise(sx, sy);
+        float BC = Mathf.PerlinNoise(sy, sz);
+        float AC = Mathf.PerlinNoise(sx, sz);
+
+        float BA = Mathf.PerlinNoise(sy, sx);
+        float CB = Mathf.PerlinNoise(sz, sy);
+        float CA = Mathf.PerlinNoise(sz, sx);
+
+        return (AB + BA + BC + CB + AC + CA) / 6f;
+    }
+
     private float GenerateHeight(int x, int y)
     {
         //return Mathf.PerlinNoise(x / 32f, y / 32f) +
         //Mathf.PerlinNoise(x / 24f, y / 24f) * 5 +
         //Mathf.PerlinNoise(x / 16f, y / 16f) * 10 + 
         //Mathf.PerlinNoise(x / 8f, y / 8f) * 30;
-        return Mathf.Pow(Mathf.PerlinNoise(x / 96f, y / 96f), 4f) * 48 + 
-            Mathf.PerlinNoise(x / 64f, y / 64f) * 24 + 
+        return Mathf.Pow(Mathf.PerlinNoise(x / 96f, y / 96f), 4f) * 48 +
+            Mathf.PerlinNoise(x / 64f, y / 64f) * 24 +
             Mathf.PerlinNoise(x / 32f, y / 32f) * 12 +
             Mathf.PerlinNoise(x / 16f, y / 16f) * 6;
     }
